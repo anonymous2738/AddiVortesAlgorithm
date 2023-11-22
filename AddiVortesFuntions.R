@@ -38,7 +38,7 @@ NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
     TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
     Modification="Change"}
   else{ #Swop a dimension.
-    NumberOfCovariates=1:length(x[1,]) ) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
+    NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
     NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
     DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
     DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
