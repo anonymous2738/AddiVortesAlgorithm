@@ -1,6 +1,3 @@
-install.packages('foreach')
-install.packages('doParallel')
-
 library(parallel)
 library(foreach)
 library(doParallel)
