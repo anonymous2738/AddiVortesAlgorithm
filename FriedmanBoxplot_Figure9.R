@@ -5,6 +5,17 @@ library(parallel)
 library(foreach)
 library(doParallel)
 
+#100 Friedman datasets
+BenchmarkX<-list()
+BenchmarkY<-list()
+for (i in 1:100){
+  
+  set.seed(8)
+  BenchmarkX[[i]]=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
+  Ey = f(BenchmarkX[[i]])
+  BenchmarkY[[i]]=Ey+sigma*rnorm(n)
+}
+
 # Number of cross-validation folds
 NumOfRep <- 1
 num_folds <- 5
@@ -35,7 +46,7 @@ cl3 <- makeCluster(num_cores)
 registerDoParallel(cl3)
 
 
-for (l in 1:5){
+for (l in 1:100){
   set.seed(324)
   
   X<-BenchmarkX[[l]]
