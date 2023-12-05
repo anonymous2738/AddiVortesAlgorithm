@@ -1,6 +1,9 @@
 library("plotrix")
 
-AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,o,IntialSigma = "Linear"){
+
+AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+
+  p=lenght(x[1,]) #p is the number of covariates in used
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -8,8 +11,7 @@ AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_ra
   for (i in 1:length(x[1,])){
     xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
   }
-  
-  #YTest=(YTest-(max(YTest)+min(YTest))/2)/(max(YTest)-min(YTest));
+
   for (i in 1:length(XTest[1,])){
     XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
   }
@@ -173,14 +175,14 @@ AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_ra
   CovariataesUsedPercentage<-CovariatesUsed/sum(CovariatesUsed)
   plot(CovariataesUsedPercentage)
   
-  plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5,main = paste("p=", o)) 
+  plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5,main = paste("p=", p)) 
   abline(0,1)
   
-  plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5,main= paste("p=", o))
+  plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5,main= paste("p=", p))
   abline(0,1)
   
   #plot(plotForSigmaSquared,col=c(rep('red',burn_in),rep('black',max_iter-burn_in)),xlab="MCMC iteration",ylab="Sigma draw",type="l")
-  plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5,  main= paste("p=", o))
+  plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5,  main= paste("p=", p))
   
   # Draw the first segment in red
   segments(x0 = 1:(burn_in - 1), y0 = plotForSigmaSquared[1:(burn_in - 1)],
