@@ -113,6 +113,3 @@ AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_ra
   )
 }
 
-hello<- function(){
-  print('Hello')
-  }
