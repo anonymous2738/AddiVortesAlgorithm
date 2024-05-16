@@ -1,5 +1,5 @@
 # Load necessary library if you haven't already
-if (!requireNamespace("invgamma", quietly = TRUE)) {
+if (!requireNamespace("readr", quietly = TRUE)) {
   install.packages("readr")
 }
 library(readr)
