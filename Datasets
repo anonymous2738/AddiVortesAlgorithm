@@ -1,0 +1,9 @@
+# Load necessary library if you haven't already
+install.packages("readr")
+library(readr)
+
+# URL of the dataset hosted on GitHub
+url <- "https://raw.githubusercontent.com/username/repository/branch/filename.csv"
+
+# Import the dataset into R
+data <- read_csv(url)
