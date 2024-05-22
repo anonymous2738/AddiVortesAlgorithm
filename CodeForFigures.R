@@ -370,10 +370,12 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   
   mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
   mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+
+  CovariataesUsedPercentage<-CovariatesUsed/sum(CovariatesUsed)
   
   return(
     data.frame(
-      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
+      CovariataesUsedPercentage
     )
   )
 }
