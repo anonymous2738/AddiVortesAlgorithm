@@ -262,7 +262,7 @@ figure6<-function(){
   TrainSet=sort(sample.int(n,50*n/51));
   TestSet=1:n;
   TestSet=TestSet[! TestSet %in% TrainSet];
-  
+  par(mfrow=c(1,1)))
   #Creating graph
   
   lineCol <- c("#e23224", "orange", "#762d92", "black", "#0928ff")
