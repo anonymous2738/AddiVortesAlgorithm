@@ -3,7 +3,7 @@ library("plotrix")
 
 AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
 
-  p=lenght(x[1,]) #p is the number of covariates in used
+  p=length(x[1,]) #p is the number of covariates used
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -216,10 +216,6 @@ figure5<- function(){
   
   # Assuming you have a dataset 'data' and a black-box regression model 'model'
   for (i in 1:10){
-    library('invgamma')
-    library('FNN')
-    library('expint')
-    
     # Create a data frame with X1 values and other variables the same as your dataset
     data_range <-rep(list(X),n)
     
@@ -230,7 +226,6 @@ figure5<- function(){
     predictions<- foreach(j = c(1,10,20,30,40,50,60,70, 80,90,100),.combine = rbind) %dopar% {
       library('invgamma')
       library('FNN')
-      library('expint')
       library("plotrix")
       
       h<-sort(X[,i])
