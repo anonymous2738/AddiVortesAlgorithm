@@ -332,7 +332,7 @@ figure7<-function(){
         omega<- params[5]
         lambda<- params[6]
         
-        rmse_values[i] <- AddiVortes_Algorithm(Y[TrainSet],as.matrix(X[TrainSet,]),m,1200,200,nu,q,k,sd,omega,lambda,f(X[TestSet,]),as.matrix(X[TestSet,]))$RMSE
+        rmse_values[i] <- AddiVortes_Algorithm_Plot(Y[TrainSet],as.matrix(X[TrainSet,]),m,1200,200,nu,q,k,sd,omega,lambda,f(X[TestSet,]),as.matrix(X[TestSet,]))$RMSE
       }
 
       print(rmse_values)
