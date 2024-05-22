@@ -371,52 +371,9 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
   mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
   
-  LowerConfidenceTRAINValue<-vector(length=length(mean_yhat))
-  UpperConfidenceTRAINValue<-vector(length=length(mean_yhat))
-  
-  for (i in 1:length(mean_yhat)){
-    PredictionMatrix[i,]<-sort(PredictionMatrix[i,])
-    
-    if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
-      LowerConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-    else{
-      LowerConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-  }
-  
-  
-  
-  LowerConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
-  UpperConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
-  
-  for (i in 1:length(mean_yhat_Test)){
-    TestMatrix[i,]<-sort(TestMatrix[i,])
-    
-    if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
-      LowerConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-    else{
-      LowerConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-  }
-  
-  print(Tess)
-  
-  PredictionTest = TestPrediction(XTest,m,Tess,Dim,Pred)*(max(y)-min(y))+(max(y)+min(y))/2;
-  AverageRMSETest=sqrt(mean(((YTest-mean_yhat_Test)^2)));
-
-  PredictionTrain = TestPrediction(xScaled,m,Tess,Dim,Pred)*(max(y)-min(y))+(max(y)+min(y))/2;
-  AverageRMSETrain=sqrt(mean((y-mean_yhat)^2));
-  
   return(
     data.frame(
-      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2)),
-      CovariataesUsedPercentage
+      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
     )
   )
 }
