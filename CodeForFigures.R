@@ -388,7 +388,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
 
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
   n = 510      #number of observations
-  set.seed(9)
+  set.seed(23)
   X=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
   Ey = f(X)
   Y=Ey+sigma*rnorm(n)
