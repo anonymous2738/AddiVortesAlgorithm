@@ -18,7 +18,7 @@ figure2<-function(){
   TestSet=1:n
   TestSet=TestSet[! TestSet %in% TrainSet]
   
-  par(mfrow =c(1,3)
+  par(mfrow =c(1,3))
   
     AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
   
