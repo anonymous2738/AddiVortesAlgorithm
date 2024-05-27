@@ -333,7 +333,7 @@ figure3<-function(){
     
   }
   
-  AddiVortes_Algorithm_Ploy(Y[TrainSet],X[TrainSet,],200,2000,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
 }
 
 library(parallel)
