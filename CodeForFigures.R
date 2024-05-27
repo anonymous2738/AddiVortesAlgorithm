@@ -217,7 +217,7 @@ figure3<-function(){
   
   par(mfrow =c(1,2))
   
-  AddiVortes_Algorithm<-function(y,x,m,max_iter,nu,q,k,var,Omega,lambda_rate,IntialSigma = "Linear"){
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,nu,q,k,var,Omega,lambda_rate,IntialSigma = "Linear"){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -333,7 +333,7 @@ figure3<-function(){
     
   }
   
-  AddiVortes_Algorithm(Y[TrainSet],X[TrainSet,],200,200,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
+  AddiVortes_Algorithm_Ploy(Y[TrainSet],X[TrainSet,],200,2000,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
 }
 
 library(parallel)
