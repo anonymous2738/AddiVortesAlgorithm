@@ -3,11 +3,11 @@ library("plotrix")
 figure2<-function(){
 
   f = function(x){
-  10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
+    10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
   }
   
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-  n = 200      #number of observations
+  n = 300      #number of observations
   set.seed(9)
   X=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
   Ey = f(X)
@@ -20,9 +20,7 @@ figure2<-function(){
   
   par(mfrow =c(1,3))
   
-    AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
-  
-    p=length(x[1,]) #p is the number of covariates used
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -30,39 +28,45 @@ figure2<-function(){
     for (i in 1:length(x[1,])){
       xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
     }
-  
+    
+    
     for (i in 1:length(XTest[1,])){
       XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
     }
     
+    
     #Initialize the Prediction Set, Dimension set and Tessellation Set
     
     Pred<-rep(list(matrix(mean(yScaled)/m)),m)
-    
     Dim=vector(length = m)
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))}
+      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+    }
     
-    SumOfAllTess=rep(mean(yScaled),length(yScaled));
-    SigmaSquaredMu=(0.5/(k*sqrt(m)))^2;
+    #Prepare some variables used in the backfitting algorithm
+    SumOfAllTess=rep(mean(yScaled),length(yScaled))
+    SigmaSquaredMu=(0.5/(k*sqrt(m)))^2
     LastTessPred=matrix
-    acceptedTess=0;
+    
+    #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
     PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
+    TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
     TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
     plotForSigmaSquared<-vector(length = max_iter)
     plotForRMSE<-vector(length = max_iter)
     
     #finding lambda
-    if (IntialSigma=="Naive"){
+    if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
       SigmaSquaredHat=sd(y)
     }
-    else{
+    else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
       MultiLinear<-lm(y ~ x)
       SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
     }
-    print(SigmaSquaredHat)
+    
+    #Find lambda
     lambda=1;
     lambda <- optim(par = 1,
                     fitting_function,
@@ -71,70 +75,64 @@ figure2<-function(){
                     upper = 100,
                     q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
     
-    print(lambda)
     for (i in 1:max_iter){
-      NumOfCells<-0
-      NumOfDim<-0
       
-      #Sample Whole model Sigma squared
+      #Sample Sigma squared using all tessellations to predict the outcome variables
       SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
-      print((mean((yScaled-SumOfAllTess)^2))^0.5)
       plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
       plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
       for (j in 1:m){
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var)
-        TessStar<-NewTessOutput[[1]]
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
         
-        ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred)
-        R_ijOld<-ResidualsOutput[[1]]
+        ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred) #Calculate the n-vector of partial residuals derived from a fitting process that excludes the jth tessellation and the number of observations in each cell.
+        R_ijOld<-ResidualsOutput[[1]]   #Old and New refer to the original and proposed tessellations
         n_ijOld<-ResidualsOutput[[2]]
         R_ijNew<-ResidualsOutput[[3]]
         n_ijNew<-ResidualsOutput[[4]]
-        SumOfAllTess<-ResidualsOutput[[5]]
-        IndexesStar<-ResidualsOutput[[6]]
-        Indexes<-ResidualsOutput[[7]]
+        SumOfAllTess<-ResidualsOutput[[5]] #Keeps track of the prediction for all tessellations to help sample sigma squared.
+        IndexesStar<-ResidualsOutput[[6]] #Gives the row of each observation for the cell it falls in for the proposed tessellation.
+        Indexes<-ResidualsOutput[[7]]  #Gives the row of each observation for the cell it falls in for the original tessellation.
         
-        if (!any(n_ijNew==0)){
+        if (!any(n_ijNew==0)){ #automatically rejects proposed tessellation if there exists a cell with no observations in.
           
-          LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate);
+          LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate) #Gives the log of the acceptence probability.
           
-          if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){
-            #print(exp(log(runif(n=1, min=0, max=1))))
+          
+          if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){ #Accepts the proposed tessellation is accepted then calculates the new output values for the new tessellation. 
             Tess=TessStar
             Dim=DimStar
             Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
             LastTessPred=Pred[[j]][IndexesStar]
-            acceptedTess=acceptedTess+1
           }
-          else {
+          else { #Rejects the proposed tesellation then calculates new output values for the original tessellation.
             Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
             LastTessPred=Pred[[j]][Indexes];
           }
         }
-        else{
+        else{ #Rejects the proposed tesellation then calculates new output values for the original tessellation.
           Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
           LastTessPred=Pred[[j]][Indexes];
         }
-        if (j==m){
+        if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
           SumOfAllTess=SumOfAllTess+LastTessPred;
         }
-        #print(j)
-        CovariatesUsed[Dim[[j]]]<-CovariatesUsed[Dim[[j]]]+1
-        NumOfCells<-NumOfCells+length(Tess[[j]][,1])
-        NumOfDim<-NumOfDim+length(Tess[[j]][1,])
       }
       
-      if (i>burn_in){
+      if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
         PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
         TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
+      print(i)
     }
     
+    #finding the mean of the predition over the iterations and then unscaling the predictions.
     mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
     mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+    mean_yhat_Test_ColSum=(colSums(TestMatrix)/(length(TestMatrix[,1])))*(max(y)-min(y))+((max(y)+min(y))/2)
     
     LowerConfidenceTRAINValue<-vector(length=length(mean_yhat))
     UpperConfidenceTRAINValue<-vector(length=length(mean_yhat))
@@ -169,25 +167,17 @@ figure2<-function(){
         UpperConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
       }
     }
-    
-    print(Tess)
-    
-    PredictionTest = TestPrediction(XTest,m,Tess,Dim,Pred)*(max(y)-min(y))+(max(y)+min(y))/2;
-    AverageRMSETest=sqrt(mean(((YTest-mean_yhat_Test)^2)));
   
-    PredictionTrain = TestPrediction(xScaled,m,Tess,Dim,Pred)*(max(y)-min(y))+(max(y)+min(y))/2;
-    AverageRMSETrain=sqrt(mean((y-mean_yhat)^2));
-  
-
     
-    plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5,main = paste("p=", p)) 
+    
+    plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5) 
     abline(0,1)
     
-    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5,main= paste("p=", p))
+    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5)
     abline(0,1)
     
     #plot(plotForSigmaSquared,col=c(rep('red',burn_in),rep('black',max_iter-burn_in)),xlab="MCMC iteration",ylab="Sigma draw",type="l")
-    plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5,  main= paste("p=", p))
+    plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5)
     
     # Draw the first segment in red
     segments(x0 = 1:(burn_in - 1), y0 = plotForSigmaSquared[1:(burn_in - 1)],
@@ -203,8 +193,9 @@ figure2<-function(){
       )
     )
   }
+  
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear")
 
-  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,6000,1000,6,0.85,3,0.8,3,25,Y[TestSet],X[TestSet,],IntialSigma = "Linear")
 }
 
 library(parallel)
