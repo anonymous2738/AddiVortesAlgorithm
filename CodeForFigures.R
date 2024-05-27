@@ -226,11 +226,6 @@ figure4<-function(){
       xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
     }
     
-    
-    for (i in 1:length(XTest[1,])){
-      XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
-    }
-    
     #Initialize:
     #Prediction Set (A list of vectors with the output values for each tessellation), 
     #Dimension set (A list of vectors with the covariates included in the tessellaions);
