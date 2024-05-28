@@ -2,6 +2,7 @@ library("plotrix")
 
 figure2<-function(list_of_datasets){
 
+  library(randomForests)
   # Number of cross-validation folds
   # Number of cross-validation folds
   NumOfRep <- 20
