@@ -973,7 +973,7 @@ figure8<-function(){
   TestSet=1:n
   TestSet=TestSet[! TestSet %in% TrainSet]
   
-  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=100)
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=100)
   
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
   n = 300      #number of observations
@@ -987,7 +987,7 @@ figure8<-function(){
   TestSet=1:n
   TestSet=TestSet[! TestSet %in% TrainSet]
   
-  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=1000)
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=1000)
 
 }
 
