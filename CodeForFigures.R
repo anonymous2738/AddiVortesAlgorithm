@@ -1,4 +1,19 @@
+if (!requireNamespace("randomForests", quietly = TRUE)) {
+  install.packages("randomForests")
+}
+
+if (!requireNamespace("plotrix", quietly = TRUE)) {
+  install.packages("plotrix")
+}
+
+if (!requireNamespace("doParallel", quietly = TRUE)) {
+  install.packages("doParallel")
+}
+
 library("plotrix")
+library(parallel)
+library(foreach)
+library(doParallel) 
 
 figure2<-function(list_of_datasets){
 
@@ -58,7 +73,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   
   num_cores <- 10 # Specify the number of cores you want to use
   cl <- makeCluster(num_cores)
-  registerDoParallel(cl)
+  registerdoParallel(cl)
   
   for (l in 1:4){
     set.seed(324)
@@ -629,11 +644,7 @@ figure4<-function(){
   }
   
   AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
-}
-
-library(parallel)
-library(foreach)
-library(doParallel)  
+} 
 
 figure5<- function(){
   SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
