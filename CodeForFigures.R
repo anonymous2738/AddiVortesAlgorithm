@@ -337,15 +337,37 @@ library(doParallel)
 
 figure5<- function(){
 
+  f = function(x){
+    10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
+  }
+  
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 100      #number of observations
+  set.seed(9)
+  X=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
+  
   num_cores <- 11  # Specify the number of cores you want to use
   cl <- makeCluster(num_cores)
   registerDoParallel(cl)
+  
   xlabels<-c("x1","x2","x3","x4","x5","x6","x7","x8","x9","x10")
   
   par(mfrow = c(2, 5))
   
   # Assuming you have a dataset 'data' and a black-box regression model 'model'
   for (i in 1:10){
+    library('invgamma')
+    library('FNN')
+    library('expint')
+    
     # Create a data frame with X1 values and other variables the same as your dataset
     data_range <-rep(list(X),n)
     
@@ -356,13 +378,14 @@ figure5<- function(){
     predictions<- foreach(j = c(1,10,20,30,40,50,60,70, 80,90,100),.combine = rbind) %dopar% {
       library('invgamma')
       library('FNN')
+      library('expint')
       library("plotrix")
       
       h<-sort(X[,i])
       data_range[[j]][,i] <- rep(h[j],n)
       return(
-        mean(AddiVortes_Algorithm_Plot(Y,X,200,6000,1000,6,0.85,3,0.8,3,25,Y,data_range[[j]])$mean_yhat_Test)
-        )
+        mean(AddiVortes_Algorithm(Y,X,200,1200,200,6,0.85,3,0.8,3,25,Y,data_range[[j]])$mean_yhat_Test)
+      )
     }
     
     h<-sort(X[,i])
