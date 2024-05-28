@@ -10,10 +10,37 @@ if (!requireNamespace("doParallel", quietly = TRUE)) {
   install.packages("doParallel")
 }
 
+if (!requireNamespace("invgamma", quietly = TRUE)) {
+  install.packages("invgamma")
+}
+
+if (!requireNamespace("FNN", quietly = TRUE)) {
+  install.packages("FNN")
+}
+
+if (!requireNamespace("BayesTree", quietly = TRUE)) {
+  install.packages("BayesTree")
+}
+
+if (!requireNamespace("gbm", quietly = TRUE)) {
+  install.packages("gbm")
+}
+
+if (!requireNamespace("SoftBart", quietly = TRUE)) {
+  install.packages("SoftBART")
+}
+
 library("plotrix")
+library(doParallel) 
 library(parallel)
 library(foreach)
-library(doParallel) 
+library(SoftBart)
+library(gbm)
+library(BayesTree)
+library(invgamma)
+library(FNN)
+library(randomForests)
+
 
 figure2<-function(list_of_datasets){
 
