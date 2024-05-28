@@ -1,5 +1,5 @@
-if (!requireNamespace("randomForests", quietly = TRUE)) {
-  install.packages("randomForests")
+if (!requireNamespace("randomForest", quietly = TRUE)) {
+  install.packages("randomForest")
 }
 
 if (!requireNamespace("plotrix", quietly = TRUE)) {
@@ -39,12 +39,12 @@ library(gbm)
 library(BayesTree)
 library(invgamma)
 library(FNN)
-library(randomForests)
+library(randomForest)
 
 
 figure2<-function(list_of_datasets){
 
-  library(randomForests)
+  library(randomForest)
   # Number of cross-validation folds
   # Number of cross-validation folds
   NumOfRep <- 20
