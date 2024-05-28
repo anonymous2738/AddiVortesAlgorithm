@@ -337,6 +337,7 @@ library(doParallel)
 
 figure5<- function(){
 
+  source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/AddiVortesMainCode.R")
   AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
   
     #Scaling x and y
