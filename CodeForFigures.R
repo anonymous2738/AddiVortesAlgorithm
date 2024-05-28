@@ -771,18 +771,6 @@ figure8<-function(){
     10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
   }
   
-  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-  n = 300      #number of observations
-  set.seed(9)
-  X=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
-  Ey = f(X)
-  Y=Ey+sigma*rnorm(n)
-  
-  n=length(Y)
-  TrainSet=sort(sample.int(n,3*n/6))
-  TestSet=1:n
-  TestSet=TestSet[! TestSet %in% TrainSet]
-  
   par(mfrow =c(3,3))
   
   AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear",p){
@@ -958,9 +946,47 @@ figure8<-function(){
       )
     )
   }
+
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  set.seed(9)
+  X=matrix(runif(n*20),n,20) #20 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
   
   AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=20)
+
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  set.seed(9)
+  X=matrix(runif(n*100),n,100) #100 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
   AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=100)
+  
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  set.seed(9)
+  X=matrix(runif(n*1000),n,1000) #1000 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
   AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=1000)
 
 }
