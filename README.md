@@ -37,7 +37,7 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 
 ```
 
-For each dataset, this imports the full datasets but also the feature matrix (X_dataset) and output variable (Y_dataset) so that the Addivortes algorithm can be implemented. For example, for the Boston to run the AddiVortes algorithm:
+For each dataset, this imports the full datasets but also the feature matrix (X_dataset) and output variable (Y_dataset) so that the Addivortes algorithm can be implemented. For example, to run the AddiVortes algorithm for the Boston dataset:
 
 ```r
 Boston #Full Boston dataset
