@@ -2,60 +2,60 @@
 if (!requireNamespace("readr", quietly = TRUE)) {
   install.packages("readr")
 }
+# Load the necessary library
 library(readr)
 
-# Import the dataset into R
+# Import the datasets into R
 abalone <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/abalone_Data.csv")
-X_abalone<-as.matrix(abalone[,2:8])
-Y_abalone<-as.numeric(as.matrix(abalone[,9]))
-
-
+X_abalone <- as.matrix(abalone[,2:8])
+Y_abalone <- as.numeric(as.matrix(abalone[,9]))
 
 Baskball <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Baskball_Data.csv")
-X_Baskball<-Baskball[,2:5]
-Y_Baskball<-Baskball[,6]
+X_Baskball <- as.matrix(Baskball[,2:5])
+Y_Baskball <- as.numeric(as.matrix(Baskball[,6]))
 
 Boston <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/BostonHousing_Data.csv")
-X_Boston<-Boston[,2:14]
-Y_Boston<-Boston[,15]
+X_Boston <- as.matrix(Boston[,2:14])
+Y_Boston <- as.numeric(as.matrix(Boston[,15]))
 
 Enroll <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Enroll_Data.csv")
-X_Enroll<-Enroll[,2:7]
-Y_Enroll<-Enroll[,8]
+X_Enroll <- as.matrix(Enroll[,2:7])
+Y_Enroll <- as.numeric(as.matrix(Enroll[,8]))
 
 Fat <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/FAT_Data.csv")
-X_Fat<-Fat[,2:14]
-Y_Fat<-Fat[,15]
+X_Fat <- as.matrix(Fat[,2:14])
+Y_Fat <- as.numeric(as.matrix(Fat[,15]))
 
 HatCo <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/HatCo_Data.csv")
-X_HatCo<-HatCo[,2:13]
-Y_HatCo<-HatCo[,14]
+X_HatCo <- as.matrix(HatCo[,2:13])
+Y_HatCo <- as.numeric(as.matrix(HatCo[,14]))
 
 Labour <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Labour_Data.csv")
-X_Labour<-Labour[,2:20]
-Y_Labour<-Labour[,21]
+X_Labour <- as.matrix(Labour[,2:20])
+Y_Labour <- as.numeric(as.matrix(Labour[,21]))
 
 Mpg <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/MPG_Data.csv")
-X_Mpg<-Mpg[,2:8]
-Y_Mpg<-Mpg[,9]
+X_Mpg <- as.matrix(Mpg[,2:8])
+Y_Mpg <- as.numeric(as.matrix(Mpg[,9]))
 
 Medicare <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Medicare_Data.csv")
-X_Medicare<-Medicare[,2:7]
-Y_Medicare<-Medicare[,8]
+X_Medicare <- as.matrix(Medicare[,2:7])
+Y_Medicare <- as.numeric(as.matrix(Medicare[,8]))
 
 Price <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Price_Data.csv")
-X_Price<-Price[,2:16]
-Y_Price<-Price[,17]
+X_Price <- as.matrix(Price[,2:16])
+Y_Price <- as.numeric(as.matrix(Price[,17]))
 
 Rate <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/RATE_Data.csv")
-X_Rate<-Rate[,2:10]
-Y_Rate<-Rate[,11]
+X_Rate <- as.matrix(Rate[,2:10])
+Y_Rate <- as.numeric(as.matrix(Rate[,11]))
 
 Edu <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/edu_Data.csv")
-X_Edu<-Edu[,2:7]
-Y_Edu<-Edu[,8]
+X_Edu <- as.matrix(Edu[,2:7])
+Y_Edu <- as.numeric(as.matrix(Edu[,8]))
 
 Ozone <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/ozone_Data.csv")
-X_Ozone<-Ozone[,2:8]
-Y_Ozone<-Ozone[,9]
+X_Ozone <- as.matrix(Ozone[,2:8])
+Y_Ozone <- as.numeric(as.matrix(Ozone[,9]))
+
 
