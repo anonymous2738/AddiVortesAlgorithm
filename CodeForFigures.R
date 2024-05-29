@@ -673,7 +673,7 @@ figure4<-function(){
   AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],200,2000,6,0.85,3,0.8,3,25,IntialSigma = "Linear")
 } 
 
-figure5<- function(){
+figure5<- function(max_iter = 6000 , burn_in = 1000){
   SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
   n=length(y)
@@ -1018,7 +1018,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
       h<-sort(X[,i])
       data_range[[j]][,i] <- rep(h[j],n)
       return(
-        mean(AddiVortes_Algorithm(Y,X,200,1200,200,6,0.85,3,0.8,3,25,Y,data_range[[j]])$mean_yhat_Test)
+        mean(AddiVortes_Algorithm(Y,X,200,max_iter,burn_in,6,0.85,3,0.8,3,25,Y,data_range[[j]])$mean_yhat_Test)
       )
     }
     
@@ -1033,7 +1033,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
   stopCluster(cl)
 }
 
-figure6<-function(){
+figure6<-function(max_iter = 6000, burn_in = 1000){
 
 AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
 
@@ -1197,10 +1197,10 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
     
   for (m in c(10, 20, 50, 100, 200)) {
      if (m == 10) {
-      plot(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, 6000, 1000, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, type = "b", col = lineCol[1], lty = lineType[1], xlim = c(1, 10),ylim=c(0,0.3), ylab = "Percentage Used",xlab="Covariate",cex.lab=1.5,lwd=2)
+      plot(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, max_iter, burn_in, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, type = "b", col = lineCol[1], lty = lineType[1], xlim = c(1, 10),ylim=c(0,0.3), ylab = "Percentage Used",xlab="Covariate",cex.lab=1.5,lwd=2)
     } 
     else {print("hi")
-      lines(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, 6000, 1000, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, col = lineCol[i],lty = lineType[i] , type="b",lwd=2)
+      lines(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, max_iter, burn_in, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, col = lineCol[i],lty = lineType[i] , type="b",lwd=2)
     }
       
     # Add custom x-axis labels at breaks from 1 to 10
@@ -1213,7 +1213,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   legend("topright", legend = labels, col = lineCol, lty = lineType,lwd=2,inset = 0.1)
 }
 
-figure7<-function(){
+figure7<-function(max_iter = 6000, burn_in = 1000){
   
   SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
     
@@ -1564,7 +1564,7 @@ figure7<-function(){
         omega<- params[5]
         lambda<- params[6]
         
-        rmse_values[i] <- AddiVortes_Algorithm(Y[TrainSet],as.matrix(X[TrainSet,]),m,400,200,nu,q,k,sd,omega,lambda,f(X[TestSet,]),as.matrix(X[TestSet,]))$RMSE
+        rmse_values[i] <- AddiVortes_Algorithm(Y[TrainSet],as.matrix(X[TrainSet,]),m,max_iter,burn_in,nu,q,k,sd,omega,lambda,f(X[TestSet,]),as.matrix(X[TestSet,]))$RMSE
       }
       
       print(rmse_values)
