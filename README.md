@@ -1,10 +1,4 @@
-IMPORTANT
-===========
-
-* Before even loading this package you must set the memory option via e.g. `options(java.parameters = "-Xmx5g")` to set a larger amount of RAM than the default of 500MB which will get you intro trouble. Only then invoke `library(bartMachine)`. If you don't do this YOU WILL GET OUT OF MEMORY ERRORS OR STUFF THAT LOOKS LIKE THIS `Error in validObject(.Object) : invalid class “jobjRef” object: invalid object for slot "jobj" in class "jobjRef": got class "NULL", should be or extend class "externalptr"`.
-
-
-bartMachine
+AddiVortes
 ===========
 
 An R-Java Bayesian Additive Regression Trees implementation (BART)
@@ -21,39 +15,21 @@ This is a Java implementation of the algorithm found in Chipman, George, & McCul
 [BART: Bayesian Additive Regressive Trees. The Annals of Applied Statistics. 
 2010 4(1): 266-298](http://projecteuclid.org/DPubS/Repository/1.0/Disseminate?view=body&id=pdfview_1&handle=euclid.aoas/1273584455 "PDF download of the BART paper") as well as many other features.
 
-News from the Past Year
----------
-6/25/23
-
-v1.3.4 released - better interaction investigator, convenient relabeling for classification
-
-2/27/23
-
-v1.3.3.1 released -- fixed bug in bartMachine constructor call that prevented local variables from being passed in.
-
-12/29/22
-
-v1.3.3 is released --- fastutil is no longer used and we have now downgraded back to trove losing the 2x speedup. I'm really sorry for the people who've used the package between Aug 25, 2022 - Dec 29, 2022 as there were probably bugs.
-
-
-The Paper
----------
-
-For a vignette describing the BART model and bartMachine's features, see our [JSS paper](https://www.jstatsoft.org/article/view/v070i04).
-
-
-The Manual
-----------
-
-See the [manual](https://github.com/kapelner/bartMachine/blob/master/bartMachine.pdf?raw=true "BART package manual") for detailed information about the 
-package's functions and parameters.
-
  
 Setup Instructions
 ------------------
 
 To install the bartMachine package in R, you first need to install Java and rJava and configure your computer, then you 
 can install the package from CRAN or compile from source.
+
+```r
+source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/AddiVortesMainCode.R")
+# Source the raw script from GitHub
+source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/Datasets.R")
+
+source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/CodeForFigures.R")
+```
+
 
 ### Install Java JDK (not the JRE)
 
