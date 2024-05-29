@@ -42,6 +42,11 @@ For each dataset, this imports the full datasets but also the feature matrix (X_
 ```r
 Boston #Full Boston dataset
 
+n=length(Y_Boston)
+TrainSet=sort(sample.int(n,5*n/6))
+TestSet=1:n
+TestSet=TestSet[! TestSet %in% TrainSet]
+
 AddiVortes_algorithm()
 
 ```
