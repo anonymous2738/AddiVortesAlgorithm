@@ -52,7 +52,7 @@ TestSet=TestSet[! TestSet %in% TrainSet]
 Reproducing Figures in paper 
 ---------------------------
 
-To reproduce the figures in the paper, to the source the following Github page by running:
+To reproduce the figures in the paper, source the following Github page by running:
 
 ```r
 
@@ -63,6 +63,8 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 ### Real World datsets Boxplot
 
 
+**Warning:** This figure use parallel processing using 10 cores at a time, producing this figure is only recommended if you have 12+ cores.
+
 ### Friedman Fimulation Figures
 
 To produce figures 3, 4 or 8 you can simply run:
@@ -72,6 +74,15 @@ figure3() #Approximate time 2 minutes 30 seconds
 figure4() #Approximate time 2 minutes 30 seconds
 figure8() #Approximate time 8 minutes
 ```
-The other figures take longer computational time to produce so we have reduce the number of interations or predictions made compared to ones used in the paper, the results may be slightly worse but still show 
+The other figures take longer computational time to produce so we give the option to reduce the number of interations or predictions made, compared to ones used in the paper. The results may be slightly worse but still show strength of the AddiVortes model.
+
+**Warning:** These figures use parallel processing using up to 10 cores at a time, producing these figures is only recommended if you have 12+ cores.
+
+```r
+figure5() #Approximate time 2 minutes 30 seconds
+figure6() 
+figure7() #Approximate time 2 minutes 30 seconds
+figure9() #Approximate time 8 minutes
+```
 
 
