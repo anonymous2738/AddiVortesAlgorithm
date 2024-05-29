@@ -1,26 +1,20 @@
 AddiVortes
 ===========
 
-An R-Java Bayesian Additive Regression Trees implementation (BART)
+An R (Bayesian) Additive Voronoi Tessellation implementation (AddiVortes)
 Software for Supervised Statistical Learning
 
-Copyright (C) 2023
-Adam Kapelner  
-Department of Mathematics, Queens College, City University of New York 
+Copyright (C) 2024
+Adam Stone  
+Department of Mathematical sciences, Durham University
 & 
-Justin Bleich
-Department of Statistics, The Wharton School of the University of Pennsylvania
-
-This is a Java implementation of the algorithm found in Chipman, George, & McCulloch 
-[BART: Bayesian Additive Regressive Trees. The Annals of Applied Statistics. 
-2010 4(1): 266-298](http://projecteuclid.org/DPubS/Repository/1.0/Disseminate?view=body&id=pdfview_1&handle=euclid.aoas/1273584455 "PDF download of the BART paper") as well as many other features.
-
+John Paul Gosling
+Department of Mathematical sciences, Durham University
  
 Setup Instructions
 ------------------
 
-To install the bartMachine package in R, you first need to install Java and rJava and configure your computer, then you 
-can install the package from CRAN or compile from source.
+To install the AddiVortes function in R, you can run the following code: 
 
 ```r
 source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/AddiVortesMainCode.R")
