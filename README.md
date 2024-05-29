@@ -79,9 +79,9 @@ The other figures take longer computational time to produce so we give the optio
 **Warning:** These figures use parallel processing using up to 10 cores at a time, producing these figures is only recommended if you have 12+ cores.
 
 ```r
-figure5() #Approximate time 2 minutes 30 seconds
-figure6() 
-figure7() #Approximate time 2 minutes 30 seconds
+figure5(max_iter = 6000 , burn_in = 1000) 
+figure6(max_iter = 6000 , burn_in = 1000) 
+figure7(max_iter = 6000 , burn_in = 1000) 
 figure9() #Approximate time 8 minutes
 ```
 
