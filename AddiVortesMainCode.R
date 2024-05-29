@@ -9,7 +9,7 @@ if (!requireNamespace("FNN", quietly = TRUE)) {
 library('invgamma')
 library('FNN')
 
-AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
