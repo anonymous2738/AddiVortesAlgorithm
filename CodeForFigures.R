@@ -1192,14 +1192,11 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   labels <- c('m=10', 'm=20', 'm=50', 'm=100', 'm=200')  # Labels for each line
   i <- 1
     
-    # Create an empty plot with the x-axis range and labels
-  plot(1, type = "n", xlim = c(1, 10), ylim = c(0, 100), xlab = "X-axis", ylab = "Percentage of covariate Used")
-    
   for (m in c(10, 20, 50, 100, 200)) {
      if (m == 10) {
       plot(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, max_iter, burn_in, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, type = "b", col = lineCol[1], lty = lineType[1], xlim = c(1, 10),ylim=c(0,0.3), ylab = "Percentage Used",xlab="Covariate",cex.lab=1.5,lwd=2)
     } 
-    else {print("hi")
+    else {
       lines(AddiVortes_Algorithm_Plot_figure6(Y[TrainSet], as.matrix(X[TrainSet, ]), m, max_iter, burn_in, 6, 0.85, 3, 0.8, 3, 25, f(X[TestSet, ]), as.matrix(X[TestSet, ]))$CovariataesUsedPercentage, col = lineCol[i],lty = lineType[i] , type="b",lwd=2)
     }
       
