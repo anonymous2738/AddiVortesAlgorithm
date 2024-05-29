@@ -4,10 +4,9 @@ AddiVortes
 Implementation of the (Bayesian) Additive Voronoi Tessellation (AddiVortes) algorithm in Rstudio.
 
 Copyright (C) 2024
-Adam Stone  
-Department of Mathematical sciences, Durham University
-& 
-John Paul Gosling
+
+Adam Stone  & John Paul Gosling
+
 Department of Mathematical sciences, Durham University
  
 Setup Instructions
@@ -30,14 +29,14 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 Benchmark Real Datasets
 -----------------------------
 
-To import real world datasets in Rstudio one can run the following code:
+To import the real world benchmark datasets used in the paper in Rstudio one can run the following code:
 
 ```r
 source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/Datasets.R")
 
 ```
 
-For each dataset, this imports the full datasets but also the feature matrix (X_dataset) and output variable (Y_dataset) so that the Addivortes algorithm can be implemented. For example, to run the AddiVortes algorithm for the Boston dataset:
+For each dataset, this imports the full datasets but also the feature matrix (X_dataset) and output variable (Y_dataset) so that the Addivortes algorithm can be implemented. For example, to run the AddiVortes algorithm for the Boston dataset, use the following code:
 
 ```r
 Boston #Full Boston dataset
@@ -52,4 +51,27 @@ TestSet=TestSet[! TestSet %in% TrainSet]
 ```
 Reproducing Figures in paper 
 ---------------------------
+
+To reproduce the figures in the paper, to the source the following Github page by running:
+
+```r
+
+source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/CodeForFigures.R")
+
+```
+
+### Real World datsets Boxplot
+
+
+### Friedman Fimulation Figures
+
+To produce figures 3, 4 or 8 you can simply run:
+
+```r
+figure3() #Approximate time 2 minutes 30 seconds
+figure4() #Approximate time 2 minutes 30 seconds
+figure8() #Approximate time 8 minutes
+```
+The other figures take longer computational time to produce so we have reduce the number of interations or predictions made compared to ones used in the paper, the results may be slightly worse but still show 
+
 
