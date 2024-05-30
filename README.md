@@ -24,7 +24,11 @@ library(devtools)
 source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/main/AddiVortesMainCode.R")
 
 ```
+The following function can then be used in Rstudio.
 
+```r
+
+```
 
 Benchmark Real Datasets
 -----------------------------
