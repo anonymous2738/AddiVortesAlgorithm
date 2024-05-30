@@ -27,8 +27,36 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 The following function can then be used in Rstudio.
 
 ```r
-
+ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear")
 ```
+### Aguments
+
+y- Dependent variable for training (in sample) data.
+
+x- Explanatory variables for training (in sample) data. A matrix with (as usual) rows corresponding to observations and columns to variables.
+
+m- Number of tessellations.
+
+max_iter- Number of iterations of the MCMC backfitting algorithm.
+
+Burn_in- Number of iterations discarded before sampling posterior 
+
+nu- Degrees of freedom for error variance prior.
+
+q- The quantile of the prior that the rough estimate of σ is placed at. The closer the quantile is to 1, the more aggresive the fit will be as you are putting more prior weight on error standard deviations (σ) less than the rough estimate.
+
+k- Number of prior standard deviations E(Y∣x)=f(x) is away from +/-.5. The response (y) is internally scaled to range from -.5 to .5. 
+
+Omega- Probability of covariate being included as a dimension in Tessellation prior. 
+
+lambda_rate- The rate of the number of centres in a tessellation for Poisson distribution in tessellation prior.
+
+YTest- Dependent variable for test (out of sample) data. Should have same structure as y.
+
+XTest- Explanatory variables for test (out of sample) data. Should have same structure as x.
+
+IntialSigma- Either "Linear" or "Naive". When “Naive”, a rough estimate of σ corresponds to the sample standard deviation of the transformed training response values.
+If “Linear”, the rough estimate of σ is based on the residual standard deviation from a least-squares linear regression of Y on the original X variables.
 
 Benchmark Real Datasets
 -----------------------------
@@ -50,7 +78,7 @@ TrainSet=sort(sample.int(n,5*n/6))
 TestSet=1:n
 TestSet=TestSet[! TestSet %in% TrainSet]
 
- AddiVortes_Algorithm(Y_Boston[TrainSet],X_Boston[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,Y_Boston[TestSet,],X_Boston[TestSet,],IntialSigma = "Linear")
+ AddiVortes_Algorithm(Y_Boston[TrainSet],X_Boston[TrainSet,],200,2000,200,6,0.85,3,0.8,3,25,Y_Boston[TestSet],X_Boston[TestSet,],IntialSigma = "Linear")
 
 ```
 Reproducing Figures in paper 
@@ -78,7 +106,7 @@ figure3() #Approximate time 2 minutes 30 seconds
 figure4() #Approximate time 2 minutes 30 seconds
 figure8() #Approximate time 8 minutes
 ```
-The other figures take longer computational time to produce so we give the option to reduce the number of interations or predictions made, compared to ones used in the paper. The results may be slightly worse but still show strength of the AddiVortes model.
+The other figures take longer computational time to produce so we give the option to reduce the number of interations or predictions made compared to ones used in the paper. The results may be slightly worse but still the show strength of the AddiVortes model.
 
 **Warning:** These figures use parallel processing using up to 10 cores at a time, producing these figures is only recommended if you have 12+ cores.
 
