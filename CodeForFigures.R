@@ -31,6 +31,7 @@ if (!requireNamespace("SoftBart", quietly = TRUE)) {
 }
 
 library("plotrix")
+library(parallel)
 library(doParallel) 
 library(parallel)
 library(foreach)
@@ -44,6 +45,7 @@ library(randomForest)
 
 figure2<-function(list_of_datasets){
   library(doParallel) 
+  library(foreach)
   library(randomForest)
   # Number of cross-validation folds
   # Number of cross-validation folds
