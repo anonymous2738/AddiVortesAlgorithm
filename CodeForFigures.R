@@ -168,7 +168,7 @@ figure2<-function(list_of_datasets){
 }
 
 
-  SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
+  SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
     n=length(yScaled)
     SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
