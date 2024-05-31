@@ -109,7 +109,7 @@ figure2<-function(list_of_datasets){
   for (i in 1:max_iter){
     
     #Sample Sigma squared using all tessellations to predict the outcome variables
-    SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+    SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
     
     for (j in 1:m){
       NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
