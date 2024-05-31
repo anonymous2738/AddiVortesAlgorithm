@@ -401,11 +401,11 @@ figure3<-function(){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(y)
+      SigmaSquaredHat=sd(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-      MultiLinear<-lm(y ~ x)
-      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
     }
     
     #Find lambda
@@ -420,7 +420,7 @@ figure3<-function(){
     for (i in 1:max_iter){
       
       #Sample Sigma squared using all tessellations to predict the outcome variables
-      SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
       plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
@@ -591,11 +591,11 @@ figure4<-function(){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(y)
+      SigmaSquaredHat=sd(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-      MultiLinear<-lm(y ~ x)
-      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+      MultiLinear<-lm(yScaled ~ x)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
     }
     
     #Find lambda
@@ -612,7 +612,7 @@ figure4<-function(){
       NumOfDim<-0
       
       #Sample Sigma squared using all tessellations to predict the outcome variables
-      SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
       for (j in 1:m){
         
@@ -674,7 +674,7 @@ figure4<-function(){
 } 
 
 figure5<- function(max_iter = 6000 , burn_in = 1000){
-  SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
+  SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
   n=length(y)
   SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+(max(y)-min(y))^2*sum((yScaled-SumOfAllTess)^2))/2)
@@ -894,11 +894,11 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(y)
+      SigmaSquaredHat=sd(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-      MultiLinear<-lm(y ~ x)
-      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
     }
     
     #Find lambda
@@ -913,7 +913,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
     for (i in 1:max_iter){
       
       #Sample Sigma squared using all tessellations to predict the outcome variables
-      SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
       for (j in 1:m){
         NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
@@ -1074,11 +1074,11 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   
   #finding lambda
   if (IntialSigma=="Naive"){
-    SigmaSquaredHat=sd(y)
+    SigmaSquaredHat=sd(yScaled)
   }
   else{
-    MultiLinear<-lm(y ~ x)
-    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+    MultiLinear<-lm(yScaled ~ xScaled)
+    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
   }
   print(SigmaSquaredHat)
   lambda=1;
@@ -1095,7 +1095,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
     NumOfDim<-0
     
     #Sample Whole model Sigma squared
-    SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+    SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
     print((mean((yScaled-SumOfAllTess)^2))^0.5)
     plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
     plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
@@ -1212,7 +1212,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
 
 figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
   
-  SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
+  SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
     
     n=length(y)
     SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+(max(y)-min(y))^2*sum((yScaled-SumOfAllTess)^2))/2)
@@ -1429,11 +1429,11 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(y)
+      SigmaSquaredHat=sd(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-      MultiLinear<-lm(y ~ x)
-      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
     }
     
     #Find lambda
@@ -1448,7 +1448,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
     for (i in 1:max_iter){
       
       #Sample Sigma squared using all tessellations to predict the outcome variables
-      SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
       
       for (j in 1:m){
@@ -1642,11 +1642,11 @@ figure8<-function(){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(y)
+      SigmaSquaredHat=sd(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-      MultiLinear<-lm(y ~ x)
-      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
     }
     
     #Find lambda
@@ -1661,7 +1661,7 @@ figure8<-function(){
     for (i in 1:max_iter){
       
       #Sample Sigma squared using all tessellations to predict the outcome variables
-      SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
       plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
