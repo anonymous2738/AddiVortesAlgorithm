@@ -66,7 +66,7 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
   for (i in 1:max_iter){
     
     #Sample Sigma squared using all tessellations to predict the outcome variables
-    SigmaSquared=SigmaSquaredCalculation(y,yScaled,nu,lambda,SumOfAllTess)
+    SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
     
     for (j in 1:m){
       NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
