@@ -47,11 +47,11 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
   
   #finding lambda
   if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-    SigmaSquaredHat=sd(y)
+    SigmaSquaredHat=sd(yScaled)
   }
   else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-    MultiLinear<-lm(y ~ x)
-    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(y)-length(x[1,])-1)
+    MultiLinear<-lm(yScaled ~ xScaled)
+    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
   }
   
   #Find lambda
@@ -126,7 +126,7 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
 
 SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
-  n=length(y)
+  n=length(yScaled)
   SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
   
   return(SigmaSquared)
