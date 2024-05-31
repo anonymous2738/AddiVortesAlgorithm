@@ -43,7 +43,7 @@ library(randomForest)
 
 
 figure2<-function(list_of_datasets){
-
+  library(doParallel) 
   library(randomForest)
   # Number of cross-validation folds
   # Number of cross-validation folds
