@@ -127,9 +127,9 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
 SigmaSquaredCalculation<-function(y,yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
   n=length(y)
-  SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+(max(y)-min(y))^2*sum((yScaled-SumOfAllTess)^2))/2)
+  SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
   
-  return(SigmaSquared/(max(y)-min(y))^2)
+  return(SigmaSquared)
 }
 
 NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
