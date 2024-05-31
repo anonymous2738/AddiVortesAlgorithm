@@ -102,7 +102,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   
   num_cores <- 10 # Specify the number of cores you want to use
   cl <- makeCluster(num_cores)
-  registerdoParallel(cl)
+  registerDoParallel(cl)
   
   for (l in 1:4){
     set.seed(324)
