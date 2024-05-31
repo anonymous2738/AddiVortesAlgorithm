@@ -5,7 +5,7 @@ Implementation of the (Bayesian) Additive Voronoi Tessellation (AddiVortes) algo
 
 Copyright (C) 2024
 
-Adam Stone  & John Paul Gosling
+Adam Stone & John Paul Gosling
 
 Department of Mathematical Sciences, Durham University
  
@@ -27,7 +27,9 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 The following function can then be used in Rstudio.
 
 ```r
- AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear")
+ AddiVortes_Algorithm<-function(y, x, m = 200, max_iter = 1200, burn_in = 200,
+                                nu = 6, q =0.85, k = 3, var = 0.8, Omega = 3,
+                                lambda_rate = 25, YTest, XTest, IntialSigma = "Linear")
 ```
 ### Arguments
 
@@ -51,9 +53,9 @@ Omega- Probability of covariate being included as a dimension in Tessellation pr
 
 lambda_rate- The rate of the number of centres in a tessellation for Poisson distribution in tessellation prior.
 
-YTest- Dependent variable for test (out of sample) data. Should have the same structure as y.
+YTest- Dependent variable for test (out of sample) data. These should have the same structure as y.
 
-XTest- Explanatory variables for test (out of sample) data. Should have the same structure as x.
+XTest- Explanatory variables for test (out of sample) data. These should have the same structure as x.
 
 IntialSigma- Either "Linear" or "Naive". When “Naive”, a rough estimate of σ corresponds to the sample standard deviation of the transformed training response values.
 If “Linear”, the rough estimate of σ is based on the residual standard deviation from a least-squares linear regression of Y on the original X variables.
