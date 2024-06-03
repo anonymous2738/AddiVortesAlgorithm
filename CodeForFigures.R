@@ -2037,8 +2037,6 @@ figure8<-function(){
       }
     }
     
-    
-    
     LowerConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
     UpperConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
     
@@ -2055,8 +2053,6 @@ figure8<-function(){
       }
     }
   
-    
-    
     plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5, main = paste("p=", p)) 
     abline(0,1)
     
