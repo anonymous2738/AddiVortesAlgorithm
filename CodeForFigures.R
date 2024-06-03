@@ -985,7 +985,7 @@ figure5<- function(max_iter = 6000 , burn_in = 1000){
   n=length(yScaled)
   SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
   
-  return(SigmaSquared/(max(y)-min(y))^2)
+  return(SigmaSquared)
 }
 
 NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
@@ -2093,7 +2093,6 @@ figure8<-function(){
 
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
   n = 300      #number of observations
-  set.seed(9)
   X=matrix(runif(n*100),n,100) #100 variables, only first 5 matter
   Ey = f(X)
   Y=Ey+sigma*rnorm(n)
@@ -2107,7 +2106,6 @@ figure8<-function(){
   
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
   n = 300      #number of observations
-  set.seed(9)
   X=matrix(runif(n*1000),n,1000) #1000 variables, only first 5 matter
   Ey = f(X)
   Y=Ey+sigma*rnorm(n)
