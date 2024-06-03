@@ -43,7 +43,7 @@ library(FNN)
 library(randomForest)
 
 
-figure2<-function(list_of_datasets){
+figure2<-function(list_of_datasets)){
   library(doParallel) 
   library(foreach)
   library(randomForest)
