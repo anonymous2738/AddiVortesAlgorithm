@@ -982,7 +982,7 @@ figure4<-function(){
 figure5<- function(max_iter = 6000 , burn_in = 1000){
   SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
   
-  n=length(y)
+  n=length(yScaled)
   SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+(max(y)-min(y))^2*sum((yScaled-SumOfAllTess)^2))/2)
   
   return(SigmaSquared/(max(y)-min(y))^2)
