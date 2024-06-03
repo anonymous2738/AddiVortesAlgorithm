@@ -134,7 +134,7 @@ The other figures take longer computational time to produce so we give the optio
 ```r
 figure5(max_iter = 6000 , burn_in = 1000) 
 figure6(max_iter = 6000 , burn_in = 1000) 
-figure7(max_iter = 6000 , burn_in = 1000, num_samples = 1000) 
+figure7(max_iter = 6000 , burn_in = 1000, num_of_datasets = 100) 
 figure9(max_iter = 1200, burn_in= 200, num_of_datasets= 100)
 
 
