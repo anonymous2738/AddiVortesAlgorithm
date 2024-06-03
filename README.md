@@ -135,7 +135,9 @@ The other figures take longer computational time to produce so we give the optio
 figure5(max_iter = 6000 , burn_in = 1000) 
 figure6(max_iter = 6000 , burn_in = 1000) 
 figure7(max_iter = 6000 , burn_in = 1000, num_samples = 1000) 
-figure9() 
+figure9(max_iter = 1200, burn_in= 200, num_of_datasets= 100)
+
+
 ```
 
-
+The defualt values are the values used in the paper to create the figures, but it is recommended to reduce number of iterations of the MCMC and burn_in (and for figure9 "number of new datasets created") to reduce the computational time.
