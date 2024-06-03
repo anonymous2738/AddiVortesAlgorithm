@@ -43,7 +43,7 @@ library(FNN)
 library(randomForest)
 
 
-figure2<-function(list_of_datasets)){
+figure2<-function(list_of_datasets){
   library(doParallel) 
   library(foreach)
   library(randomForest)
@@ -404,7 +404,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   cl <- makeCluster(num_cores)
   registerDoParallel(cl)
   
-  for (l in 1:length(list_of_datasets){
+  for (l in 1:length(list_of_datasets)){
     set.seed(324)
     
     X<-BenchmarkX[[l]]
