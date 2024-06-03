@@ -92,7 +92,7 @@ figure2<-function(list_of_datasets){
   
   #finding lambda
   if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-    SigmaSquaredHat=sd(yScaled)
+    SigmaSquaredHat=var(yScaled)
   }
   else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
     MultiLinear<-lm(yScaled ~ xScaled)
@@ -703,7 +703,7 @@ figure3<-function(){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(yScaled)
+      SigmaSquaredHat=var(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
       MultiLinear<-lm(yScaled ~ xScaled)
@@ -895,7 +895,7 @@ figure4<-function(){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(yScaled)
+      SigmaSquaredHat=var(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
       MultiLinear<-lm(yScaled ~ x)
@@ -1200,7 +1200,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(yScaled)
+      SigmaSquaredHat=var(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
       MultiLinear<-lm(yScaled ~ xScaled)
@@ -1380,7 +1380,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   
   #finding lambda
   if (IntialSigma=="Naive"){
-    SigmaSquaredHat=sd(yScaled)
+    SigmaSquaredHat=var(yScaled)
   }
   else{
     MultiLinear<-lm(yScaled ~ xScaled)
