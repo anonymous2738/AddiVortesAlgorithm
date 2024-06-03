@@ -1517,10 +1517,10 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
   
   SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
     
-    n=length(y)
-    SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+(max(y)-min(y))^2*sum((yScaled-SumOfAllTess)^2))/2)
+    n=length(yScaled)
+    SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
     
-    return(SigmaSquared/(max(y)-min(y))^2)
+    return(SigmaSquared)
   }
   
   NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
@@ -1732,7 +1732,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
     
     #finding lambda
     if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-      SigmaSquaredHat=sd(yScaled)
+      SigmaSquaredHat=var(yScaled)
     }
     else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
       MultiLinear<-lm(yScaled ~ xScaled)
