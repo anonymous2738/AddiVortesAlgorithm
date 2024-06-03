@@ -1513,7 +1513,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   legend("topright", legend = labels, col = lineCol, lty = lineType,lwd=2,inset = 0.1)
 }
 
-figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
+figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 100){
   
   SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
     
@@ -1842,8 +1842,8 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
   
   
   rmse_values<-numeric(3)
-  RobustnessValues<-array(dim=c(3,100,8))
-  FullRobustnessValues<-array(dim=c(3,100,8))
+  RobustnessValues<-array(dim=c(3,num_samples,8))
+  FullRobustnessValues<-array(dim=c(3,num_samples,8))
   
   num_cores <- 10  # Specify the number of cores you want to use
   cl <- makeCluster(num_cores)
