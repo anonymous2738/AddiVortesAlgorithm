@@ -47,6 +47,8 @@ figure2<-function(list_of_datasets){
   library(doParallel) 
   library(foreach)
   library(randomForest)
+
+  par(mfrow =c(1,1))
   # Number of cross-validation folds
   # Number of cross-validation folds
   NumOfRep <- 20
@@ -402,7 +404,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   cl <- makeCluster(num_cores)
   registerDoParallel(cl)
   
-  for (l in 1:4){
+  for (l in 1:length(list_of_datasets){
     set.seed(324)
     
     X<-BenchmarkX[[l]]
