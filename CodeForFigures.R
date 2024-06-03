@@ -2121,6 +2121,15 @@ figure8<-function(){
 
 
 figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
+
+  
+f = function(x){
+  10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
+}
+
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 200      #number of observations
+  
   #100 Friedman datasets
   BenchmarkX<-list()
   BenchmarkY<-list()
