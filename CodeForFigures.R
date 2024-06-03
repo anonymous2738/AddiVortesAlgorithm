@@ -2126,11 +2126,11 @@ figure8<-function(){
 }
 
 
-figure9<-function(){
+figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
   #100 Friedman datasets
   BenchmarkX<-list()
   BenchmarkY<-list()
-  for (i in 1:100){
+  for (i in 1:num_of_datasets){
     
     set.seed(8)
     BenchmarkX[[i]]=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
@@ -2168,7 +2168,7 @@ figure9<-function(){
   registerDoParallel(cl3)
   
   
-  for (l in 1:100){
+  for (l in 1:num_of_datasets){
     set.seed(324)
     
     X<-BenchmarkX[[l]]
@@ -2294,7 +2294,7 @@ figure9<-function(){
       library('invgamma')
       library('FNN')
       
-      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),50,1200,200,6,0.85,3,0.8,3,25,f(X[TestSet[,k],]),as.matrix(X[TestSet[,k],]))$RMSE
+      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),50,max_iter,burn_in,6,0.85,3,0.8,3,25,f(X[TestSet[,k],]),as.matrix(X[TestSet[,k],]))$RMSE
     }
     
     BART.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
@@ -2357,8 +2357,7 @@ figure9<-function(){
   
   
   boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,],All.RMSE[5,],horizontal = TRUE, names = unique(c("AddiVortes-CV", "AddiVortes-default","BART","Random Forests", "Boosting")))
+
+  return(All.RMSE)
   
-  boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,],horizontal = TRUE, names = unique(c("AddiVortes-Def","BART","Random Forests","Boosting")))
-  
-  length(All.RRMSE[1,])
   }
