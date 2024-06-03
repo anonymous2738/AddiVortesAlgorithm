@@ -421,7 +421,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
       TestSet[,h]=TestSetInit[! TestSetInit %in% TrainSet[,h]];
       
     }  
-    print('finished h')
+
     #Cross validation
     folds <- createFolds(X, k = num_folds)  # 5-fold cross-validation
     
@@ -770,7 +770,9 @@ figure3<-function(){
         PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
         TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
-      print(i)
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+      }
     }
     
     #finding the mean of the predition over the iterations and then unscaling the predictions.
@@ -962,7 +964,9 @@ figure4<-function(){
       
       AverageNumberOfCells[i]<-NumOfCells/m
       AverageNumberOfDim[i]<-NumOfDim/m
-      print(i)
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+      }
     }
   
     
@@ -1382,7 +1386,6 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
     MultiLinear<-lm(yScaled ~ xScaled)
     SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
   }
-  print(SigmaSquaredHat)
   lambda=1;
   lambda <- optim(par = 1,
                   fitting_function,
@@ -1391,14 +1394,12 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
                   upper = 100,
                   q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
   
-  print(lambda)
   for (i in 1:max_iter){
     NumOfCells<-0
     NumOfDim<-0
     
     #Sample Whole model Sigma squared
     SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
-    print((mean((yScaled-SumOfAllTess)^2))^0.5)
     plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
     plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
     
@@ -1422,7 +1423,6 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
         LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate);
         
         if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){
-          #print(exp(log(runif(n=1, min=0, max=1))))
           Tess=TessStar
           Dim=DimStar
           Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
@@ -1441,12 +1441,13 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
       if (j==m){
         SumOfAllTess=SumOfAllTess+LastTessPred;
       }
-      #print(j)
       CovariatesUsed[Dim[[j]]]<-CovariatesUsed[Dim[[j]]]+1
       NumOfCells<-NumOfCells+length(Tess[[j]][,1])
       NumOfDim<-NumOfDim+length(Tess[[j]][1,])
     }
-    print(i)
+    if (i %% 100 == 0){
+      cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+    }
     
     AverageNumberOfCells[i]<-NumOfCells/m
     AverageNumberOfDim[i]<-NumOfDim/m
@@ -1795,7 +1796,9 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
         PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
         TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
-      print(i)
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+      }
     }
     
     #finding the mean of the predition over the iterations and then unscaling the predictions.
@@ -1855,7 +1858,6 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
       
       for (i in 1:nrow(hyperparametersAddiVortesRobust)){
         params<-hyperparametersAddiVortesRobust[i,]
-        print(params)
         nu <- params[1]
         q<- params[2]
         k<- params[3]
@@ -1865,11 +1867,9 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_samples = 1000){
         
         rmse_values[i] <- AddiVortes_Algorithm(Y[TrainSet],as.matrix(X[TrainSet,]),m,max_iter,burn_in,nu,q,k,sd,omega,lambda,f(X[TestSet,]),as.matrix(X[TestSet,]))$RMSE
       }
-      
-      print(rmse_values)
+    
       return(rmse_values)
     }
-    print(m)
   }
   
   
@@ -2011,7 +2011,9 @@ figure8<-function(){
         PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
         TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
-      print(i)
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+      }
     }
     
     #finding the mean of the predition over the iterations and then unscaling the predictions.
@@ -2183,8 +2185,7 @@ figure9<-function(){
       TestSetInit<-1:n
       TestSet[,h]=TestSetInit[! TestSetInit %in% TrainSet[,h]];
       
-    }  
-    print('finished h')
+    } 
     #Cross validation
     folds <- createFolds(X[1:125,], k = num_folds)  # 5-fold cross-validation
     
@@ -2288,7 +2289,6 @@ figure9<-function(){
     ordered_indices <- order(results_matrixRF[, 1])
     ordered_results <- results_matrixRF[ordered_indices, ]
     PercentOfVariable<-ordered_results[1,2]
-    print('part 2')
     
     Default.AddiVortes.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
       library('invgamma')
@@ -2314,7 +2314,6 @@ figure9<-function(){
       RForest.RMSE<-(mean((f(X[TestSet[,k],])-RandomF$test$predicted)**2))**0.5
     }
     
-    print('hi')
     # Perform cross-validation with the bart function
     Boost.RMSE<-vector(length=NumOfRep)
     Boost.RMSE<-foreach(k = 1:NumOfRep,.combine = cbind) %dopar% {
@@ -2332,7 +2331,7 @@ figure9<-function(){
     RMSE<-rbind(Default.AddiVortes.RMSE,BART.RMSE,RForest.RMSE,Boost.RMSE)
     
     
-    print('finished')
+    print('Finished')
     print(l)
     
     boxplot(RMSE[1,],RMSE[2,],RMSE[3,],RMSE[4,],horizontal = TRUE, names = unique(c("AddiVortes Default", "BART", "Random Forests","Gradient Boosting")))
