@@ -47,7 +47,7 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
   
   #finding lambda
   if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-    SigmaSquaredHat=sd(yScaled)
+    SigmaSquaredHat=var(yScaled)
   }
   else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
     MultiLinear<-lm(yScaled ~ xScaled)
