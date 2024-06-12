@@ -27,7 +27,7 @@ if (!requireNamespace("gbm", quietly = TRUE)) {
 }
 
 if (!requireNamespace("SoftBart", quietly = TRUE)) {
-  install.packages("SoftBART")
+  install.packages("SoftBart")
 }
 
 library("plotrix")
