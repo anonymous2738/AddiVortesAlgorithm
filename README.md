@@ -125,7 +125,7 @@ To produce figures 3, 4 or 8 you can simply run:
 ```r
 figure3() #Approximate time 2 minutes 30 seconds
 figure4() #Approximate time 2 minutes 30 seconds
-figure8() #Approximate time 8 minutes
+figure8() #Approximate time 2 minutes
 ```
 The other figures take longer computational time to produce so we give the option to reduce the number of iterations or predictions made compared to the ones used in the paper. The results may be slightly worse but still show the strength of the AddiVortes model.
 
