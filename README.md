@@ -140,4 +140,4 @@ figure9(max_iter = 1200, burn_in= 200, num_of_datasets= 100)
 
 ```
 
-The defualt values are the values used in the paper to create the figures, but it is recommended to reduce number of iterations of the MCMC and burn_in (and for figure9 "number of new datasets created") to reduce the computational time.
+The defualt values are the values used in the paper to create the figures, but it is recommended to reduce number of iterations of the MCMC and burn_in (and for figure7/9 "number of new datasets created") to reduce the computational time.
