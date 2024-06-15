@@ -375,6 +375,16 @@ figure2<-function(list_of_datasets){
     omega=c(3),
     lambda=c(5,25)
   )
+
+   hyperparametersAddiVortes <- expand.grid(
+    m=c(200),
+    nu=c(6),
+    q=c(0.85),
+    k=c(1,3),
+    sd=c(0.05,0.2,0.4),
+    omega=c(3,5),
+    lambda=c(20,30,45,60,80)
+  )
   
   hyperparametersBoost <- expand.grid(
     depth=c(1,2,3,4),
