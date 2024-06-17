@@ -644,10 +644,10 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   
   stopCluster(cl)
     
-  Smaller.RRMSE.AddiVortesCV<-Full.RRMSE[1,Full.RRMSE[1,]<1.5]
-  Smaller.RRMSE.AddiVortesDef<-Full.RRMSE[2,Full.RRMSE[2,]<1.5]
-  Smaller.RRMSE.BART<-Full.RRMSE[3,Full.RRMSE[3,]<1.5]
-  Smaller.RRMSE.RF<-Full.RRMSE[4,Full.RRMSE[4,]<1.5]
+  Smaller.RRMSE.AddiVortesCV<-All.RRMSE[1,All.RRMSE[1,]<1.5]
+  Smaller.RRMSE.AddiVortesDef<-All.RRMSE[2,All.RRMSE[2,]<1.5]
+  Smaller.RRMSE.BART<-All.RRMSE[3,All.RRMSE[3,]<1.5]
+  Smaller.RRMSE.RF<-All.RRMSE[4,All.RRMSE[4,]<1.5]
   
   boxplot(as.numeric(Smaller.RRMSE.AddiVortesCV),as.numeric(Smaller.RRMSE.AddiVortesDef),as.numeric(Smaller.RRMSE.BART), as.numeric(Smaller.RRMSE.RF),horizontal = TRUE, names = unique(c("AddiVortes-CV", "AddiVortes-default","BART","Random Forests")))
   return(All.RRMSE)
