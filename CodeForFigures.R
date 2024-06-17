@@ -1451,7 +1451,9 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
       if (j==m){
         SumOfAllTess=SumOfAllTess+LastTessPred;
       }
-      CovariatesUsed[Dim[[j]]]<-CovariatesUsed[Dim[[j]]]+1
+      if(i>burn_in){
+        CovariatesUsed[Dim[[j]]]<-CovariatesUsed[Dim[[j]]]+1
+      }
       NumOfCells<-NumOfCells+length(Tess[[j]][,1])
       NumOfDim<-NumOfDim+length(Tess[[j]][1,])
     }
