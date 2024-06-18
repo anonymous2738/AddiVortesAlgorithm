@@ -2660,10 +2660,7 @@ f = function(x){
   
   stopCluster(cl3)
   
-  All.RMSE<-read.csv(file= "/home/grads/gmwc55/Documents/RRMSEdata/RMSEVAluesP10" )
-  All.RMSE<-as.matrix(All.RMSE[,2:101],)
-  
-  for(i in 1:5){
+  for(i in 1:4){
     All.RMSE[i,]<-as.vector(All.RMSE[i,])
   }
   
