@@ -2437,7 +2437,7 @@ f = function(x){
 }
 
   sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-  n = 200      #number of observations
+  n = 1100      #number of observations
   
   #100 Friedman datasets
   BenchmarkX<-list()
