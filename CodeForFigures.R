@@ -2665,7 +2665,7 @@ f = function(x){
   }
   
   
-  boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,],All.RMSE[5,],horizontal = TRUE, names = unique(c("AddiVortes-CV", "AddiVortes-default","BART","Random Forests", "Boosting")))
+  boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,],horizontal = TRUE, names = unique(c("AV-DF","BART","Random Forests", "Boosting")))
 
   return(All.RMSE)
   
