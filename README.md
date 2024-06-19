@@ -117,6 +117,16 @@ The function figure2() produces a boxplot for each individual dataset in the lis
 
 Do not run all the datasets at the same time, since each dataset can take 1-2 hours. It is recommended to run 1 or 2 datasets at a time. To create Figure 2, we ran the function with 1 or 2 datasets until we had estimations for all datasets and then created a boxplot by cbinding the matrices.
 
+### Example
+
+For example, to get RRMSE values for the datasets: Rate, Edu, Enroll and Mpg, you can run the following code:
+
+```r
+
+RRMSE<-figure2(list(Rate,Edu,Enroll,Mpg))
+
+```
+
 Friedman Simulation Figures
 --------------
 
