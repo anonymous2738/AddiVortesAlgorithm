@@ -79,10 +79,10 @@ For each dataset, this imports the full datasets and the feature matrix (X_datas
 ```r
 Boston #Full Boston dataset
 
-n=length(Y_Boston)
-TrainSet=sort(sample.int(n,5*n/6))
-TestSet=1:n
-TestSet=TestSet[! TestSet %in% TrainSet]
+n <- length(Y_Boston)
+TrainSet <- sort(sample.int(n,5*n/6))
+TestSet <- 1:n
+TestSet <- TestSet[! TestSet %in% TrainSet]
 
  AddiVortes_Algorithm(Y_Boston[TrainSet],X_Boston[TrainSet,],
                       200,2000,200,6,0.85,3,0.8,3,25,
@@ -126,7 +126,7 @@ For example, to get RRMSE values for the datasets: Rate, Edu, Enroll and Mpg, yo
 
 ```r
 
-RRMSE<-figure2(list(Rate,Edu,Enroll,Mpg))
+RRMSE <- figure2(list(Rate,Edu,Enroll,Mpg))
 
 ```
 
