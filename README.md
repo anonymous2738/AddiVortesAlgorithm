@@ -33,31 +33,31 @@ The following function can then be used in Rstudio.
 ```
 ### Arguments
 
-y- Dependent variable for training (in sample) data. A numerical vector with output value with the same index as the corresponding row of observation in x.
+`y`- Dependent variable for training (in sample) data. A numerical vector with output value with the same index as the corresponding row of observation in x.
 
-x- Explanatory variables for training (in sample) data. A matrix with (as usual) rows corresponding to observations and columns to variables.
+`x`- Explanatory variables for training (in sample) data. A matrix with (as usual) rows corresponding to observations and columns to variables.
 
-m- Number of tessellations.
+`m`- Number of tessellations.
 
-max_iter- Number of iterations of the MCMC backfitting algorithm.
+`max_iter`- Number of iterations of the MCMC backfitting algorithm.
 
-Burn_in- Number of iterations discarded before sampling posterior. 0 < burn_in < max_iter.
+`Burn_in`- Number of iterations discarded before sampling posterior. 0 < burn_in < max_iter.
 
-nu- Degrees of freedom for error variance prior.
+`nu`- Degrees of freedom for error variance prior.
 
-q- The quantile of the prior that the rough estimate of σ is placed at. The closer the quantile is to 1, the more aggressive the fit will be as you are putting more prior weight on error standard deviations (σ) less than the rough estimate.
+`q`- The quantile of the prior that the rough estimate of σ is placed at. The closer the quantile is to 1, the more aggressive the fit will be as you are putting more prior weight on error standard deviations (σ) less than the rough estimate.
 
-k- Number of prior standard deviations E(Y∣x)=f(x) is away from +/-.5. The response (y) is internally scaled to range from -.5 to .5. 
+`k`- Number of prior standard deviations E(Y∣x)=f(x) is away from +/-.5. The response (y) is internally scaled to range from -.5 to .5. 
 
-Omega- Probability of covariate being included as a dimension in Tessellation prior. 
+`Omega`- Probability of covariate being included as a dimension in Tessellation prior. 
 
-lambda_rate- The rate of the number of centres in a tessellation for Poisson distribution in tessellation prior.
+`lambda_rate`- The rate of the number of centres in a tessellation for Poisson distribution in tessellation prior.
 
-YTest- Dependent variable for test (out of sample) data. These should have the same structure as y.
+`YTest`- Dependent variable for test (out of sample) data. These should have the same structure as y.
 
-XTest- Explanatory variables for test (out of sample) data. These should have the same structure as x.
+`XTest`- Explanatory variables for test (out of sample) data. These should have the same structure as x.
 
-IntialSigma- Either "Linear" or "Naive". When “Naive”, a rough estimate of σ corresponds to the sample standard deviation of the transformed training response values.
+`IntialSigma`- Either "Linear" or "Naive". When “Naive”, a rough estimate of σ corresponds to the sample standard deviation of the transformed training response values.
 If “Linear”, the rough estimate of σ is based on the residual standard deviation from a least-squares linear regression of Y on the original X variables.
 
 ### Value
