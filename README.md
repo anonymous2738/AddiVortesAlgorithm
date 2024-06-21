@@ -12,7 +12,7 @@ Department of Mathematical Sciences, Durham University
 Setup Instructions
 ------------------
 
-To install the AddiVortes algorithm in R, you can run the following code in Rstudio: 
+To install the AddiVortes functions in R, you can run the following code: 
 
 ```r
 
@@ -62,7 +62,7 @@ If “Linear”, the rough estimate of σ is based on the residual standard devi
 
 ### Value
 
-RMSE- The RMSE of the out-of-sample estimations.
+`RMSE`- The RMSE of the out-of-sample estimations.
 
 Benchmark Real Datasets
 -----------------------------
