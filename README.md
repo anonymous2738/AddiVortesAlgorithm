@@ -62,9 +62,11 @@ If “Linear”, the rough estimate of σ is based on the residual standard devi
 
 `thinning`- Retaining every posterior post burn in sample equal to thinning. Default retains every posterior sample post burn in.
 
-### Value
+### Values
 
-`RMSE`- The RMSE of the out-of-sample estimations.
+`In_sample_RMSE`- The RMSE of the in-sample estimations.
+
+`Out_of_sample_RMSE`- The RMSE of the out-of-sample estimations.
 
 Benchmark Real Datasets
 -----------------------------
