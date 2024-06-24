@@ -106,6 +106,9 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
       if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
         SumOfAllTess=SumOfAllTess+LastTessPred;
       }
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
+      }
     }
     
     if (i>=burn_in & (i-burn_in) %% thinning ==0 ){ #vectors that hold the predictions for each iteration after burn in.
