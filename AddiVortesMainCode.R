@@ -9,7 +9,7 @@ if (!requireNamespace("FNN", quietly = TRUE)) {
 library('invgamma')
 library('FNN')
 
-AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
+AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear",thinning=1){
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -42,8 +42,9 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
   LastTessPred=matrix
   
   #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
-  PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
-  TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
+  posterior_samples<-floor((max_iter - burn_in) / thinning)+1
+  PredictionMatrix<-array(dim=c(length(y),posterior_samples))
+  TestMatrix<-array(dim=c(length(YTest),posterior_samples))
   
   #finding lambda
   if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
@@ -107,15 +108,15 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
       }
     }
     
-    if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
-      PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
-      TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
-    }
+    if (i>=burn_in & (i-burn_in) %% thinning ==0 ){ #vectors that hold the predictions for each iteration after burn in.
+      PredictionMatrix[,1+(i-burn_in)/thinning]=SumOfAllTess;
+      TestMatrix[,1+(i-burn_in)/thinning]=TestPrediction(XTest,m,Tess,Dim,Pred);
+      }
   }
   
   #finding the mean of the predition over the iterations and then unscaling the predictions.
-  mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
-  mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+  mean_yhat=(rowSums(PredictionMatrix)/(posterior_samples))*(max(y)-min(y))+((max(y)+min(y))/2)
+  mean_yhat_Test=(rowSums(TestMatrix)/(posterior_samples))*(max(y)-min(y))+((max(y)+min(y))/2)
   
   return( #Returns the RMSE value for the test samples.
     data.frame(
