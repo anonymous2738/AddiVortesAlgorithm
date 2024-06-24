@@ -29,7 +29,7 @@ The following function can then be used in Rstudio.
 ```r
  AddiVortes_Algorithm <- function(y, x, m = 200, max_iter = 1200, burn_in = 200,
                                   nu = 6, q =0.85, k = 3, var = 0.8, Omega = 3,
-                                  lambda_rate = 25, YTest, XTest, IntialSigma = "Linear"){}
+                                  lambda_rate = 25, YTest, XTest, IntialSigma = "Linear", thinning = 1){}
 ```
 ### Arguments
 
@@ -59,6 +59,8 @@ The following function can then be used in Rstudio.
 
 `IntialSigma`- Either "Linear" or "Naive". When “Naive”, a rough estimate of σ corresponds to the sample standard deviation of the transformed training response values.
 If “Linear”, the rough estimate of σ is based on the residual standard deviation from a least-squares linear regression of Y on the original X variables.
+
+`thinning`- Retaining every posterior post burn in sample equal to thinning. Default retains every posterior sample post burn in.
 
 ### Value
 
