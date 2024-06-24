@@ -123,7 +123,8 @@ AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,
   
   return( #Returns the RMSE value for the test samples.
     data.frame(
-      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
+      In_sample_RMSE = sqrt(mean((y-mean_yhat)^2)),
+      Out_of_sample_RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))     
     )
   )
 }
