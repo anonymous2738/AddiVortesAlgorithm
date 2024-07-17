@@ -7,8 +7,8 @@ library(readr)
 
 # Import the datasets into R
 abalone <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/abalone_Data.csv")
-X_abalone <- as.matrix(abalone[,2:8])
-Y_abalone <- as.numeric(as.matrix(abalone[,9]))
+X_abalone <- as.matrix(abalone[,2:9])
+Y_abalone <- as.numeric(as.matrix(abalone[,10]))
 
 Baskball <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Baskball_Data.csv")
 X_Baskball <- as.matrix(Baskball[,2:5])
