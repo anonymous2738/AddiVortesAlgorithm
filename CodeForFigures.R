@@ -814,16 +814,17 @@ figure3<-function(){
       }
     }
   
-    
-    
-    plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5) 
+    plotCI(f(x),mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5, main = paste("p=", p)) 
     abline(0,1)
     
-    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5)
+    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5, main = paste("p=", p))
     abline(0,1)
+    
+    in_interval_Train <- (f(x) >= LowerConfidenceTRAINValue) & (f(x) <= UpperConfidenceTRAINValue)
+    in_interval_TEST<- (YTest >= LowerConfidenceTESTValue) & (YTest <= UpperConfidenceTESTValue)
     
     #plot(plotForSigmaSquared,col=c(rep('red',burn_in),rep('black',max_iter-burn_in)),xlab="MCMC iteration",ylab="Sigma draw",type="l")
-    plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5)
+    plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5, main = paste("p=", p))
     
     # Draw the first segment in red
     segments(x0 = 1:(burn_in - 1), y0 = plotForSigmaSquared[1:(burn_in - 1)],
@@ -835,6 +836,8 @@ figure3<-function(){
     
     return(
       data.frame(
+        invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
+        invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
         RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
       )
     )
@@ -2055,27 +2058,32 @@ AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lamb
     }
   }
   
-  plotCI(y,mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5, main = paste("p=", p)) 
-  abline(0,1)
-  
-  plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5, main = paste("p=", p))
-  abline(0,1)
-  
-  #plot(plotForSigmaSquared,col=c(rep('red',burn_in),rep('black',max_iter-burn_in)),xlab="MCMC iteration",ylab="Sigma draw",type="l")
-  plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5, main = paste("p=", p))
-  
-  # Draw the first segment in red
-  segments(x0 = 1:(burn_in - 1), y0 = plotForSigmaSquared[1:(burn_in - 1)],
-           x1 = 2:burn_in, y1 = plotForSigmaSquared[2:burn_in], col = "red", lwd = 2)
-  # Draw the second segment in black
-  segments(x0 = (burn_in):(max_iter - 1), y0 = plotForSigmaSquared[(burn_in+1):(max_iter - 1)],
-           x1 = (burn_in+1):max_iter, y1 = plotForSigmaSquared[(burn_in):max_iter], col = "black", lwd = 2)
-  abline(1,0)
-  
-  return(
-    data.frame(
-      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
-    )
+    plotCI(f(x),mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5, main = paste("p=", p)) 
+    abline(0,1)
+    
+    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5, main = paste("p=", p))
+    abline(0,1)
+    
+    in_interval_Train <- (f(x) >= LowerConfidenceTRAINValue) & (f(x) <= UpperConfidenceTRAINValue)
+    in_interval_TEST<- (YTest >= LowerConfidenceTESTValue) & (YTest <= UpperConfidenceTESTValue)
+    
+    #plot(plotForSigmaSquared,col=c(rep('red',burn_in),rep('black',max_iter-burn_in)),xlab="MCMC iteration",ylab="Sigma draw",type="l")
+    plot(plotForSigmaSquared, type = "n", col = "black", lwd = 2, xlab="MCMC iteration",ylab="Sigma draw", cex.lab = 1.5, main = paste("p=", p))
+    
+    # Draw the first segment in red
+    segments(x0 = 1:(burn_in - 1), y0 = plotForSigmaSquared[1:(burn_in - 1)],
+             x1 = 2:burn_in, y1 = plotForSigmaSquared[2:burn_in], col = "red", lwd = 2)
+    # Draw the second segment in black
+    segments(x0 = (burn_in):(max_iter - 1), y0 = plotForSigmaSquared[(burn_in+1):(max_iter - 1)],
+             x1 = (burn_in+1):max_iter, y1 = plotForSigmaSquared[(burn_in):max_iter], col = "black", lwd = 2)
+    abline(1,0)
+    
+    return(
+      data.frame(
+        invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
+        invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
+        RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
+      )
   )
 }
 
