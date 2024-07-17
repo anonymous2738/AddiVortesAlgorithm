@@ -2078,7 +2078,7 @@ AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lamb
              x1 = (burn_in+1):max_iter, y1 = plotForSigmaSquared[(burn_in):max_iter], col = "black", lwd = 2)
     abline(1,0)
     
-    return(
+    print(
       data.frame(
         invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
         invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
