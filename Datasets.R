@@ -55,7 +55,7 @@ X_Edu <- as.matrix(Edu[,2:7])
 Y_Edu <- as.numeric(as.matrix(Edu[,8]))
 
 Ozone <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/ozone_Data.csv")
-X_Ozone <- as.matrix(Ozone[,2:8])
-Y_Ozone <- as.numeric(as.matrix(Ozone[,9]))
+X_Ozone <- as.matrix(Ozone[,2:9])
+Y_Ozone <- as.numeric(as.matrix(Ozone[,10]))
 
 
