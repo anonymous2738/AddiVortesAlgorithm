@@ -19,8 +19,8 @@ X_Boston <- as.matrix(Boston[,2:14])
 Y_Boston <- as.numeric(as.matrix(Boston[,15]))
 
 Enroll <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Enroll_Data.csv")
-X_Enroll <- as.matrix(Enroll[,2:7])
-Y_Enroll <- as.numeric(as.matrix(Enroll[,8]))
+X_Enroll <- as.matrix(Enroll[,2:6])
+Y_Enroll <- as.numeric(as.matrix(Enroll[,7]))
 
 Fat <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/FAT_Data.csv")
 X_Fat <- as.matrix(Fat[,2:14])
@@ -39,8 +39,8 @@ X_Mpg <- as.matrix(Mpg[,2:8])
 Y_Mpg <- as.numeric(as.matrix(Mpg[,9]))
 
 Medicare <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Medicare_Data.csv")
-X_Medicare <- as.matrix(Medicare[,2:7])
-Y_Medicare <- as.numeric(as.matrix(Medicare[,8]))
+X_Medicare <- as.matrix(Medicare[,2:22])
+Y_Medicare <- as.numeric(as.matrix(Medicare[,23]))
 
 Price <- read_csv("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/DataSets/Price_Data.csv")
 X_Price <- as.matrix(Price[,2:16])
