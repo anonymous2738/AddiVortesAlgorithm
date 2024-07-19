@@ -28,7 +28,7 @@ The following function can then be used in Rstudio.
 
 ```r
  AddiVortes_Algorithm <- function(y, x, m = 200, max_iter = 1200, burn_in = 200,
-                                  nu = 6, q =0.85, k = 3, var = 0.8, Omega = 3,
+                                  nu = 6, q =0.85, k = 3, sd = 0.8, Omega = 3,
                                   lambda_rate = 25, YTest, XTest, IntialSigma = "Linear", thinning = 1){}
 ```
 ### Arguments
@@ -48,6 +48,8 @@ The following function can then be used in Rstudio.
 `q`- The quantile of the prior that the rough estimate of σ is placed at. The closer the quantile is to 1, the more aggressive the fit will be as you are putting more prior weight on error standard deviations (σ) less than the rough estimate.
 
 `k`- Number of prior standard deviations E(Y∣x)=f(x) is away from +/-.5. The response (y) is internally scaled to range from -.5 to .5. 
+
+`sd` - Standard deviation of the normal distribution for new coordinates in tessellations.
 
 `Omega`- Probability of covariate being included as a dimension in Tessellation prior. 
 
