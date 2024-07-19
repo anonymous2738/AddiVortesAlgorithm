@@ -1916,163 +1916,163 @@ legend(
 
 figure8<-function(){
   f = function(x){
-  10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
-}
-
-par(mfrow =c(3,3))
-
-AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear",p){
-  
-  #Scaling x and y
-  yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
-  xScaled=x;
-  for (i in 1:length(x[1,])){
-    xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
+    10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
   }
   
+  par(mfrow =c(3,3))
   
-  for (i in 1:length(XTest[1,])){
-    XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
-  }
-  
-  
-  #Initialize the Prediction Set, Dimension set and Tessellation Set
-  
-  Pred<-rep(list(matrix(mean(yScaled)/m)),m)
-  Dim=vector(length = m)
-  Tess=vector(length = m)
-  for (i in 1:m){
-    Dim[i]<-list(sample(1:length(x[1,]), 1))
-    Tess[i]<-(list(matrix(rnorm(1,0,var))))
-  }
-  
-  #Prepare some variables used in the backfitting algorithm
-  SumOfAllTess=rep(mean(yScaled),length(yScaled))
-  SigmaSquaredMu=(0.5/(k*sqrt(m)))^2
-  LastTessPred=matrix
-  
-  #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
-  PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
-  TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
-  TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
-  plotForSigmaSquared<-vector(length = max_iter)
-  plotForRMSE<-vector(length = max_iter)
-  
-  #finding lambda
-  if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-    SigmaSquaredHat=var(yScaled)
-  }
-  else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-    MultiLinear<-lm(yScaled ~ xScaled)
-    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
-  }
-  
-  #Find lambda
-  lambda=1;
-  lambda <- optim(par = 1,
-                  fitting_function,
-                  method = "Brent",
-                  lower = 0.001,
-                  upper = 100,
-                  q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
-  
-  for (i in 1:max_iter){
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear",p){
     
-    #Sample Sigma squared using all tessellations to predict the outcome variables
-    SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
-    plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
-    plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
+    #Scaling x and y
+    yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
+    xScaled=x;
+    for (i in 1:length(x[1,])){
+      xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
+    }
     
-    for (j in 1:m){
-      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
-      TessStar<-NewTessOutput[[1]]  
-      DimStar<-NewTessOutput[[2]]
-      Modification<-NewTessOutput[[3]]
+    
+    for (i in 1:length(XTest[1,])){
+      XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
+    }
+    
+    
+    #Initialize the Prediction Set, Dimension set and Tessellation Set
+    
+    Pred<-rep(list(matrix(mean(yScaled)/m)),m)
+    Dim=vector(length = m)
+    Tess=vector(length = m)
+    for (i in 1:m){
+      Dim[i]<-list(sample(1:length(x[1,]), 1))
+      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+    }
+    
+    #Prepare some variables used in the backfitting algorithm
+    SumOfAllTess=rep(mean(yScaled),length(yScaled))
+    SigmaSquaredMu=(0.5/(k*sqrt(m)))^2
+    LastTessPred=matrix
+    
+    #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
+    PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
+    TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
+    TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
+    plotForSigmaSquared<-vector(length = max_iter)
+    plotForRMSE<-vector(length = max_iter)
+    
+    #finding lambda
+    if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
+      SigmaSquaredHat=var(yScaled)
+    }
+    else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
+    }
+    
+    #Find lambda
+    lambda=1;
+    lambda <- optim(par = 1,
+                    fitting_function,
+                    method = "Brent",
+                    lower = 0.001,
+                    upper = 100,
+                    q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
+    
+    for (i in 1:max_iter){
       
-      ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred) #Calculate the n-vector of partial residuals derived from a fitting process that excludes the jth tessellation and the number of observations in each cell.
-      R_ijOld<-ResidualsOutput[[1]]   #Old and New refer to the original and proposed tessellations
-      n_ijOld<-ResidualsOutput[[2]]
-      R_ijNew<-ResidualsOutput[[3]]
-      n_ijNew<-ResidualsOutput[[4]]
-      SumOfAllTess<-ResidualsOutput[[5]] #Keeps track of the prediction for all tessellations to help sample sigma squared.
-      IndexesStar<-ResidualsOutput[[6]] #Gives the row of each observation for the cell it falls in for the proposed tessellation.
-      Indexes<-ResidualsOutput[[7]]  #Gives the row of each observation for the cell it falls in for the original tessellation.
+      #Sample Sigma squared using all tessellations to predict the outcome variables
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
+      plotForSigmaSquared[i]=(SigmaSquared*(max(y)-min(y))^2)^0.5
+      plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
-      if (!any(n_ijNew==0)){ #automatically rejects proposed tessellation if there exists a cell with no observations in.
+      for (j in 1:m){
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        TessStar<-NewTessOutput[[1]]  
+        DimStar<-NewTessOutput[[2]]
+        Modification<-NewTessOutput[[3]]
         
-        LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate) #Gives the log of the acceptence probability.
+        ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred) #Calculate the n-vector of partial residuals derived from a fitting process that excludes the jth tessellation and the number of observations in each cell.
+        R_ijOld<-ResidualsOutput[[1]]   #Old and New refer to the original and proposed tessellations
+        n_ijOld<-ResidualsOutput[[2]]
+        R_ijNew<-ResidualsOutput[[3]]
+        n_ijNew<-ResidualsOutput[[4]]
+        SumOfAllTess<-ResidualsOutput[[5]] #Keeps track of the prediction for all tessellations to help sample sigma squared.
+        IndexesStar<-ResidualsOutput[[6]] #Gives the row of each observation for the cell it falls in for the proposed tessellation.
+        Indexes<-ResidualsOutput[[7]]  #Gives the row of each observation for the cell it falls in for the original tessellation.
         
-        
-        if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){ #Accepts the proposed tessellation is accepted then calculates the new output values for the new tessellation. 
-          Tess=TessStar
-          Dim=DimStar
-          Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
-          LastTessPred=Pred[[j]][IndexesStar]
+        if (!any(n_ijNew==0)){ #automatically rejects proposed tessellation if there exists a cell with no observations in.
+          
+          LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate) #Gives the log of the acceptence probability.
+          
+          
+          if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){ #Accepts the proposed tessellation is accepted then calculates the new output values for the new tessellation. 
+            Tess=TessStar
+            Dim=DimStar
+            Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
+            LastTessPred=Pred[[j]][IndexesStar]
+          }
+          else { #Rejects the proposed tesellation then calculates new output values for the original tessellation.
+            Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
+            LastTessPred=Pred[[j]][Indexes];
+          }
         }
-        else { #Rejects the proposed tesellation then calculates new output values for the original tessellation.
+        else{ #Rejects the proposed tesellation then calculates new output values for the original tessellation.
           Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
           LastTessPred=Pred[[j]][Indexes];
         }
+        if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
+          SumOfAllTess=SumOfAllTess+LastTessPred;
+        }
       }
-      else{ #Rejects the proposed tesellation then calculates new output values for the original tessellation.
-        Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
-        LastTessPred=Pred[[j]][Indexes];
+      
+      if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
+        PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
+        TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
-      if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
-        SumOfAllTess=SumOfAllTess+LastTessPred;
+      if (i %% 100 == 0){
+        cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
       }
     }
     
-    if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
-      PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
-      TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
-    }
-    if (i %% 100 == 0){
-      cat(sprintf("Iteration %d out of %d", i, max_iter), "\n")
-    }
-  }
-  
-  #finding the mean of the predition over the iterations and then unscaling the predictions.
-  mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
-  mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
-  mean_yhat_Test_ColSum=(colSums(TestMatrix)/(length(TestMatrix[,1])))*(max(y)-min(y))+((max(y)+min(y))/2)
-  
-  LowerConfidenceTRAINValue<-vector(length=length(mean_yhat))
-  UpperConfidenceTRAINValue<-vector(length=length(mean_yhat))
-  
-  for (i in 1:length(mean_yhat)){
-    PredictionMatrix[i,]<-sort(PredictionMatrix[i,])
+    #finding the mean of the predition over the iterations and then unscaling the predictions.
+    mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+    mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+    mean_yhat_Test_ColSum=(colSums(TestMatrix)/(length(TestMatrix[,1])))*(max(y)-min(y))+((max(y)+min(y))/2)
     
-    if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
-      LowerConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-    else{
-      LowerConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-    }
-  }
-  
-  LowerConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
-  UpperConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
-  
-  for (i in 1:length(mean_yhat_Test)){
-    TestMatrix[i,]<-sort(TestMatrix[i,])
+    LowerConfidenceTRAINValue<-vector(length=length(mean_yhat))
+    UpperConfidenceTRAINValue<-vector(length=length(mean_yhat))
     
-    if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
-      LowerConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
+    for (i in 1:length(mean_yhat)){
+      PredictionMatrix[i,]<-sort(PredictionMatrix[i,])
+      
+      if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
+        LowerConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
+        UpperConfidenceTRAINValue[i]<-(PredictionMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
+      }
+      else{
+        LowerConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
+        UpperConfidenceTRAINValue[i]<-((PredictionMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+PredictionMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
+      }
     }
-    else{
-      LowerConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
-      UpperConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
+    
+    LowerConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
+    UpperConfidenceTESTValue<-vector(length=length(mean_yhat_Test))
+    
+    for (i in 1:length(mean_yhat_Test)){
+      TestMatrix[i,]<-sort(TestMatrix[i,])
+      
+      if ((((max_iter-burn_in+1)*0.05))== round((max_iter-burn_in+1)*0.05)){
+        LowerConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.05])*(max(y)-min(y))+((max(y)+min(y))/2)
+        UpperConfidenceTESTValue[i]<-(TestMatrix[i,(max_iter-burn_in+1)*0.95])*(max(y)-min(y))+((max(y)+min(y))/2)
+      }
+      else{
+        LowerConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.05)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.05)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
+        UpperConfidenceTESTValue[i]<-((TestMatrix[i,trunc((max_iter-burn_in+1)*0.95)]+TestMatrix[i,trunc(((max_iter-burn_in+1)*0.95)+1)])/2)*(max(y)-min(y))+((max(y)+min(y))/2)
+      }
     }
-  }
-  
-    plotCI(f(x),mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)",  cex.lab = 1.5, main = paste("p=", p)) 
+    
+    plotCI(f(x),mean_yhat, UpperConfidenceTRAINValue-mean_yhat,mean_yhat-LowerConfidenceTRAINValue,sfrac=0, scol = 'grey',ylab = "posterior intervals", xlab = "In-Sample f(x)", pch = 16, cex.lab = 1.5, main = paste("p=", p)) 
     abline(0,1)
     
-    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)", cex.lab = 1.5, main = paste("p=", p))
+    plotCI(YTest,mean_yhat_Test,UpperConfidenceTESTValue-mean_yhat_Test,mean_yhat_Test-LowerConfidenceTESTValue,sfrac=0, scol = 'grey', ylab = "posterior intervals", xlab = "Out-of-Sample f(x)",pch = 16, cex.lab = 1.5, main = paste("p=", p))
     abline(0,1)
     
     in_interval_Train <- (f(x) >= LowerConfidenceTRAINValue) & (f(x) <= UpperConfidenceTRAINValue)
@@ -2089,55 +2089,56 @@ AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lamb
              x1 = (burn_in+1):max_iter, y1 = plotForSigmaSquared[(burn_in):max_iter], col = "black", lwd = 2)
     abline(1,0)
     
-    print(
+    return(
       data.frame(
         invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
         invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
         RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
       )
-  )
-}
+    )
+  }
 
-sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-n = 300      #number of observations
-set.seed(9)
-X=matrix(runif(n*20),n,20) #20 variables, only first 5 matter
-Ey = f(X)
-Y=Ey+sigma*rnorm(n)
-
-n=length(Y)
-TrainSet=sort(sample.int(n,3*n/6))
-TestSet=1:n
-TestSet=TestSet[! TestSet %in% TrainSet]
-
-AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=20)
-
-sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-n = 300      #number of observations
-X=matrix(runif(n*100),n,100) #100 variables, only first 5 matter
-Ey = f(X)
-Y=Ey+sigma*rnorm(n)
-
-n=length(Y)
-TrainSet=sort(sample.int(n,3*n/6))
-TestSet=1:n
-TestSet=TestSet[! TestSet %in% TrainSet]
-
-AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,3,0.95,3,0.2,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Naive", p=100)
-
-sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-n = 300      #number of observations
-X=matrix(runif(n*1000),n,1000) #1000 variables, only first 5 matter
-Ey = f(X)
-Y=Ey+sigma*rnorm(n)
-
-n=length(Y)
-TrainSet=sort(sample.int(n,3*n/6))
-TestSet=1:n
-TestSet=TestSet[! TestSet %in% TrainSet]
-
-AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,3,0.95,3,0.2,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Naive", p=1000)
-
+  
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  set.seed(9)
+  X=matrix(runif(n*20),n,20) #20 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.85,3,0.8,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Linear", p=20)
+  
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  X=matrix(runif(n*100),n,100) #100 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.99,3,0.2,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Naive", p=100)
+  
+  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+  n = 300      #number of observations
+  X=matrix(runif(n*1000),n,1000) #1000 variables, only first 5 matter
+  Ey = f(X)
+  Y=Ey+sigma*rnorm(n)
+  
+  n=length(Y)
+  TrainSet=sort(sample.int(n,3*n/6))
+  TestSet=1:n
+  TestSet=TestSet[! TestSet %in% TrainSet]
+  
+  AddiVortes_Algorithm_Plot(Y[TrainSet],X[TrainSet,],50,2000,200,6,0.99,3,0.2,3,25,f(X[TestSet,]),X[TestSet,],IntialSigma = "Naive", p=1000)
+  
 }
 
 
