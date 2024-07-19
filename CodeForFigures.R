@@ -2441,240 +2441,354 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
       return(Prediction)
     }
     
+set.seed(32)
+
 f = function(x){
   10*sin(pi*x[,1]*x[,2]) + 20*(x[,3]-0.5)^2+10*x[,4]+5*x[,5]
 }
 
-  sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
-  n = 1100      #number of observations
+sigma = 1  #y = f(x) + sigma*z , z~N(0,1)
+n = 1000      #number of observations
+
+#100 Friedman datasets
+BenchmarkX<-list()
+BenchmarkY<-list()
+for (i in 1:num_of_datasets){
+  BenchmarkX[[i]]=matrix(runif(n*100),n,100) #10 variables, only first 5 matter
+  Ey = f(BenchmarkX[[i]])
+  BenchmarkY[[i]]=Ey+sigma*rnorm(n)
+}
+
+# Number of cross-validation folds
+NumOfRep <- 1
+num_folds <- 5
+
+createFolds <- function(data, k) {
+  set.seed(123)  # For reproducibility
+  fold_indices <- sample(rep(1:k, length.out = nrow(data)))
+  fold_list <- split(1:nrow(data), fold_indices)
+  return(fold_list)
+}
+
+# Create a data frame with all combinations of hyperparameter values
+hyperparametersBART <- expand.grid(
+  m=c(50,200),
+  nu_q=list(c(3,0.9),c(3,0.99),c(10,0.75)),
+  k=c(1,2,3,5)
+)
+
+
+hyperparametersBoost <- expand.grid(
+  depth=c(1,2,3,4),
+  num_trees=c(50,100,200),
+  eta=c(0.01, 0.05, 0.10, 0.25)
+)
+
+hyperparametersSoftBART <- expand.grid(
+  m=c(50,200),
+  k=c(1,2,3,5)
+)
+
+hyperparametersAddiVortes <- expand.grid(
+  m=c(50,200),
+  nu=c(6),
+  q=c(0.85),
+  k=c(1,3),
+  sd=c(0.8,1.5),
+  omega=c(3),
+  lambda=c(5,25)
+)
+
+X<-BenchmarkX[[1]]
+Y<-BenchmarkY[[1]]
+
+#Cross validation
+folds <- createFolds(X, k = num_folds)  # 5-fold cross-validation
+
+num_cores <- 10  # Specify the number of cores you want to use
+cl3 <- makeCluster(num_cores)
+registerDoParallel(cl3)
+
+
+# Initialize a matrix to store the results
+results_matrixAddiVortes <- matrix(ncol = 8, nrow = nrow(hyperparametersAddiVortes))
+rmse_values<-vector(length = num_folds)
+
+# Iterate over hyperparameter combinations
+results_matrixAddiVortes<-foreach(i = 1:nrow(hyperparametersAddiVortes), .combine = rbind) %dopar% {
+  library('invgamma')
+  library('FNN')
+  library('expint')
   
-  #100 Friedman datasets
-  BenchmarkX<-list()
-  BenchmarkY<-list()
-  for (i in 1:num_of_datasets){
+  params <- hyperparametersAddiVortes[i, ]
+  rmse_values <- numeric(num_folds)
+  
+  # Perform cross-validation using a loop
+  for (j in 1:num_folds) {
+    TestSetCV <- unlist(folds[-j],use.names = FALSE)
+    TrainSetCV <- folds[[j]]
     
-    set.seed(8)
-    BenchmarkX[[i]]=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
-    Ey = f(BenchmarkX[[i]])
-    BenchmarkY[[i]]=Ey+sigma*rnorm(n)
+    m<-params$m
+    nu <- params$nu
+    q<- params$q
+    sd<- params$sd
+    omega<- params$omega
+    lambda<- params$lambda
+    k<- params$k
+    
+    # Make predictions on the test set
+    rmse_values[j] <- AddiVortes_Algorithm(Y[TrainSetCV],as.matrix(X[TrainSetCV,]),m,1200,200,nu,q,k,sd,omega,lambda,f(X[TestSetCV,]),as.matrix(X[TestSetCV,]))$Out_of_sample_RMSE
+  }                   
+  # Store the average RMSE from cross-validation
+  return(c(m,nu,q,k,sd,omega,lambda,mean(rmse_values)))
+  
+}
+
+# Find the best hyperparameter combination based on RMSE
+best_index <- which.min(results_matrixAddiVortes[, 8])
+best_hyperparametersAddiVortes <- results_matrixAddiVortes[best_index, 1:7]
+
+print("Finished AddiVortes Tuning")
+
+# Initialize a matrix to store the results
+results_matrixBoost <- matrix(ncol = 4, nrow = nrow(hyperparametersBoost))
+
+# Iterate over hyperparameter combinations
+results_matrixBoost<-foreach(i = 1:nrow(hyperparametersBoost), .combine = rbind) %dopar% {
+  library('gbm')
+  
+  params <- hyperparametersBoost[i, ]
+  rmse_values <- numeric(num_folds)
+  
+  # Perform cross-validation using a loop
+  for (j in 1:num_folds) {
+    TrainSetCV <- unlist(folds[-j],use.names = FALSE)
+    TestSetCV <- folds[[j]]
+    
+    data_frame_Train<-as.data.frame(cbind(Y[TrainSetCV],X[TrainSetCV,]))
+    data_frame_Test<-as.data.frame(cbind(f(X[TestSetCV,]),X[TestSetCV,]))
+    
+    depth <- params$depth
+    num_trees <- params$num_trees
+    eta <- params$eta
+    
+    # Train the bart model
+    gradBoost<-gbm(V1~.,data=data_frame_Train,distribution = "gaussian", interaction.depth=depth,n.trees = num_trees, shrinkage = eta)
+    
+    # Make predictions on the test set
+    rmse_values[j] <- (mean((f(X[TestSetCV,])-predict(gradBoost,newdata=data_frame_Test))**2))**0.5
   }
   
-  # Number of cross-validation folds
-  NumOfRep <- 1
-  num_folds <- 5
+  # Store the average RMSE from cross-validation
+  results_matrixBoost[i,]<-c(depth,num_trees,eta,mean(rmse_values))
   
-  createFolds <- function(data, k) {
-    set.seed(123)  # For reproducibility
-    fold_indices <- sample(rep(1:k, length.out = nrow(data)))
-    fold_list <- split(1:nrow(data), fold_indices)
-    return(fold_list)
+}
+
+# Find the best hyperparameter combination based on RMSE
+best_index <- which.min(results_matrixBoost[, 4])
+best_hyperparametersBoost <- results_matrixBoost[best_index, 1:3]
+
+print('FinishedBoostTuning')
+
+# Initialize a matrix to store the results
+results_matrixBART <- matrix(ncol = 5, nrow = nrow(hyperparametersBART))
+
+# Iterate over hyperparameter combinations
+results_matrixBART<-foreach (i = 1:nrow(hyperparametersBART), .combine = rbind) %dopar% {
+  library('BayesTree')
+  
+  params <- hyperparametersBART[i, ]
+  rmse_values <- numeric(num_folds)
+  
+  # Perform cross-validation using a loop
+  for (j in 1:num_folds) {
+    TestSetCV <- unlist(folds[-j],use.names = FALSE)
+    TrainSetCV <- folds[[j]]
+    
+    m <- params$m
+    nu <- params$nu_q[[1]][1]
+    q <- params$nu_q[[1]][2]
+    k <- params$k
+    
+    # Train the bart model
+    BartOr<-bart(as.matrix(X[TrainSetCV,]),as.numeric(as.matrix(Y[TrainSetCV])),as.matrix(X[TestSetCV,]), ntree = m, sigdf = nu,sigquant = q,k = k)
+    
+    # Make predictions on the test set
+    rmse_values[j] <- (mean((f(X[TestSetCV,])-BartOr$yhat.test.mean)**2))**0.5
   }
   
-  # Create a data frame with all combinations of hyperparameter values
-  hyperparametersBART <- expand.grid(
-    m=c(50,200),
-    nu_q=list(c(3,0.9),c(3,0.99),c(10,0.75)),
-    k=c(1,2,3,5)
-  )
+  # Store the average RMSE from cross-validation
+  results_matrixBART[i,] <- cbind(params$m,params$nu_q[[1]][1],params$nu_q[[1]][2],params$k,mean(rmse_values))
   
+}
+
+print('FinishedBARTTuning')
+
+# Find the best hyperparameter combination based on RMSE
+best_index <- which.min(results_matrixBART[, 5])
+best_hyperparametersBART <- results_matrixBART[best_index, 1:4]
+
+
+results_matrixSoftBART <- matrix(ncol = 3, nrow = nrow(hyperparametersSoftBART))
+
+results_matrixSoftBART<-foreach (i = 1:nrow(hyperparametersSoftBART), .combine = rbind) %dopar% {
+  library(SoftBart)
   
-  hyperparametersBoost <- expand.grid(
-    depth=c(1,2,3,4),
-    num_trees=c(50,100,200),
-    eta=c(0.01, 0.05, 0.10, 0.25)
-  )
+  params <- hyperparametersSoftBART[i, ]
+  rmse_values <- numeric(num_folds)
   
-  num_cores <- 10  # Specify the number of cores you want to use
-  cl3 <- makeCluster(num_cores)
-  registerDoParallel(cl3)
-  
-  
-  for (l in 1:num_of_datasets){
-    set.seed(324)
+  # Perform cross-validation using a loop
+  for (j in 1:num_folds) {
+    TestSetCV <- unlist(folds[-j],use.names = FALSE)
+    TrainSetCV <- folds[[j]]
     
-    X<-BenchmarkX[[l]]
-    Y<-BenchmarkY[[l]]
+    m <- params$m
+    ##nu <- params$nu_q[[1]][1]
+    ##q <- params$nu_q[[1]][2]
+    k <- params$k
     
-    Y<-as.numeric(as.matrix(Y))
+    df <- data.frame(X = X[TrainSetCV,], Y = Y[TrainSetCV])
+    df_test <- data.frame(X = X[TestSetCV,], Y = f(X[TestSetCV,]))
     
-    n=length(Y)
-    TrainSet<-matrix(nrow=trunc(n/11),ncol = NumOfRep)
-    TestSet<-matrix(nrow=n-trunc(n/11),ncol = NumOfRep)
+    # Train the bart model
+    SoftBARTOr<-softbart_regression(Y ~ ., df, df_test, num_tree = m,k =k)
     
-    for (h in 1:NumOfRep){
-      TrainSet[,h]=sort(sample.int(n,n/11));
-      TestSetInit<-1:n
-      TestSet[,h]=TestSetInit[! TestSetInit %in% TrainSet[,h]];
-      
-    } 
-    #Cross validation
-    folds <- createFolds(X[1:125,], k = num_folds)  # 5-fold cross-validation
-    
-    
-    # Initialize a matrix to store the results
-    results_matrixBoost <- matrix(ncol = 4, nrow = nrow(hyperparametersBoost))
-    
-    # Iterate over hyperparameter combinations
-    results_matrixBoost<-foreach(i = 1:nrow(hyperparametersBoost), .combine = rbind) %dopar% {
-      library('gbm')
-      
-      params <- hyperparametersBoost[i, ]
-      rmse_values <- numeric(num_folds)
-      
-      # Perform cross-validation using a loop
-      for (j in 1:num_folds) {
-        TrainSetCV <- unlist(folds[-j],use.names = FALSE)
-        TestSetCV <- folds[[j]]
-        
-        data_frame_Train<-as.data.frame(cbind(Y[TrainSetCV],X[TrainSetCV,]))
-        data_frame_Test<-as.data.frame(cbind(f(X[TestSetCV,]),X[TestSetCV,]))
-        
-        depth <- params$depth
-        num_trees <- params$num_trees
-        eta <- params$eta
-        
-        # Train the bart model
-        gradBoost<-gbm(V1~.,data=data_frame_Train,distribution = "gaussian", interaction.depth=depth,n.trees = num_trees, shrinkage = eta)
-        
-        # Make predictions on the test set
-        rmse_values[j] <- (mean((f(X[TestSetCV,])-predict(gradBoost,newdata=data_frame_Test))**2))**0.5
-      }
-      
-      # Store the average RMSE from cross-validation
-      results_matrixBoost[i,]<-c(depth,num_trees,eta,mean(rmse_values))
-      
-    }
-    
-    # Find the best hyperparameter combination based on RMSE
-    best_index <- which.min(results_matrixBoost[, 4])
-    best_hyperparametersBoost <- results_matrixBoost[best_index, 1:3]
-    
-    print('FinishedBoostTuning')
-    
-    # Initialize a matrix to store the results
-    results_matrixBART <- matrix(ncol = 5, nrow = nrow(hyperparametersBART))
-    
-    # Iterate over hyperparameter combinations
-    results_matrixBART<-foreach (i = 1:nrow(hyperparametersBART), .combine = rbind) %dopar% {
-      library('BayesTree')
-      
-      params <- hyperparametersBART[i, ]
-      rmse_values <- numeric(num_folds)
-      
-      # Perform cross-validation using a loop
-      for (j in 1:num_folds) {
-        TrainSetCV <- unlist(folds[-j],use.names = FALSE)
-        TestSetCV <- folds[[j]]
-        
-        m <- params$m
-        nu <- params$nu_q[[1]][1]
-        q <- params$nu_q[[1]][2]
-        k <- params$k
-        
-        # Train the bart model
-        BartOr<-bart(as.matrix(X[TrainSetCV,]),as.numeric(as.matrix(Y[TrainSetCV])),as.matrix(X[TestSetCV,]),nskip = 1000,ndpost = 3000, ntree = m, sigdf = nu,sigquant = q,k = k)
-        
-        # Make predictions on the test set
-        rmse_values[j] <- (mean((f(X[TestSetCV,])-BartOr$yhat.test.mean)**2))**0.5
-      }
-      
-      # Store the average RMSE from cross-validation
-      results_matrixBART[i,] <- cbind(params$m,params$nu_q[[1]][1],params$nu_q[[1]][2],params$k,mean(rmse_values))
-      
-    }
-    
-    print('FinishedBARTTuning')
-    
-    # Find the best hyperparameter combination based on RMSE
-    best_index <- which.min(results_matrixBART[, 5])
-    best_hyperparametersBART <- results_matrixBART[best_index, 1:4]
-    
-    # Initialize a matrix to store the results for each combination
-    results_matrixRF <- matrix(ncol = 2, nrow = 4)
-    PercentOfVariable = c(0.1,0.25,0.5,1)
-    for (i in 1:4) {
-      # Perform cross-validation using a loop
-      fold_RMSE <- numeric(num_folds)
-      for (j in 1:num_folds) {
-        TrainSetCV <- unlist(folds[-j],use.names = FALSE)
-        TestSetCV <- folds[[j]]
-        
-        mean.y.hat<-as.vector(randomForest(X[TrainSetCV,],Y[TrainSetCV],X[TestSetCV,],f(X[TestSetCV,]),mtry=round(PercentOfVariable[i]*length(X[1,])))$test$predicted)
-        fold_RMSE[j] <- sqrt(mean((f(X[TestSetCV,])-mean.y.hat)^2))
-        
-      }
-      # Store the average RMSE from cross-validation
-      results_matrixRF[i, 1] <- mean(fold_RMSE)
-      results_matrixRF[i,2] <- PercentOfVariable[i]
-    }
-    ordered_indices <- order(results_matrixRF[, 1])
-    ordered_results <- results_matrixRF[ordered_indices, ]
-    PercentOfVariable<-ordered_results[1,2]
-    
-    Default.AddiVortes.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
-      library('invgamma')
-      library('FNN')
-      
-      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),50,max_iter,burn_in,6,0.85,3,0.8,3,25,f(X[TestSet[,k],]),as.matrix(X[TestSet[,k],]))$RMSE
-    }
-    
-    BART.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
-      library('BayesTree')
-      library('expint')
-      
-      #bartMAchine
-      modelBART<-bart(as.matrix(X[TrainSet[,k],]),as.numeric(as.matrix(Y[TrainSet[,k]])),as.matrix(X[TestSet[,k],]),nskip = 1000,ndpost = 3000, ntree = best_hyperparametersBART[1], sigdf = best_hyperparametersBART[2],sigquant = best_hyperparametersBART[3],k = best_hyperparametersBART[4])
-      BART.RMSE<-(mean((f(X[TestSet[,k],])-modelBART$yhat.test.mean)**2))**0.5  
-    }
-    
-    RForest.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
-      library('randomForest')
-      #randomForests
-      
-      RandomF<-randomForest(X[TrainSet[,k],],Y[TrainSet[,k]],X[TestSet[,k],],f(X[TestSet[,k],]),mtry = round(PercentOfVariable*length(X[1,])))
-      RForest.RMSE<-(mean((f(X[TestSet[,k],])-RandomF$test$predicted)**2))**0.5
-    }
-    
-    # Perform cross-validation with the bart function
-    Boost.RMSE<-vector(length=NumOfRep)
-    Boost.RMSE<-foreach(k = 1:NumOfRep,.combine = cbind) %dopar% {
-      library('gbm')
-      #Gradient Boosting
-      
-      data_frame_Train<-as.data.frame(cbind(Y[TrainSet],X[TrainSet,]))
-      data_frame_Test<-as.data.frame(cbind(f(X[TestSet,]),X[TestSet,]))
-      
-      gradientBoost<-gbm(V1~.,data=data_frame_Train,distribution="gaussian",interaction.depth = best_hyperparametersBoost[1],n.trees = best_hyperparametersBoost[2],shrinkage = best_hyperparametersBoost[3])
-      Boost.RMSE[k]<-(mean((f(X[TestSet,])-predict(gradientBoost,newdata=data_frame_Test))**2))**0.5
-    }
-    
-    
-    RMSE<-rbind(Default.AddiVortes.RMSE,BART.RMSE,RForest.RMSE,Boost.RMSE)
-    
-    
-    print('Finished')
-    print(l)
-    
-    boxplot(RMSE[1,],RMSE[2,],RMSE[3,],RMSE[4,],horizontal = TRUE, names = unique(c("AddiVortes Default", "BART", "Random Forests","Gradient Boosting")))
-    
-    if (l==1){
-      All.RMSE<-matrix(nrow=4,ncol=NumOfRep)
-      All.RMSE<-RMSE
-    }
-    else{
-      All.RMSE<-cbind(All.RMSE,RMSE)
-    }
-  
+    # Make predictions on the test set
+    rmse_values[j] <- sqrt(mean((SoftBARTOr$mu_test_mean-f(X[TestSetCV,]))^2))
   }
   
-  stopCluster(cl3)
+  # Store the average RMSE from cross-validation
+  results_matrixSoftBART[i,] <- cbind(params$m,params$k,mean(rmse_values))
   
-  for(i in 1:4){
-    All.RMSE[i,]<-as.vector(All.RMSE[i,])
+}
+
+print('Finished SoftBART Tuning')
+
+# Find the best hyperparameter combination based on RMSE
+best_index <- which.min(results_matrixSoftBART[,3])
+best_hyperparametersSoftBART <- results_matrixSoftBART[best_index, 1:2]
+
+
+# Initialize a matrix to store the results for each combination
+results_matrixRF <- matrix(ncol = 2, nrow = 4)
+PercentOfVariable = c(0.1,0.25,0.5,1)
+for (i in 1:4) {
+  # Perform cross-validation using a loop
+  fold_RMSE <- numeric(num_folds)
+  for (j in 1:num_folds) {
+    TestSetCV <- unlist(folds[-j],use.names = FALSE)
+    TrainSetCV <- folds[[j]]
+    
+    mean.y.hat<-as.vector(randomForest(X[TrainSetCV,],Y[TrainSetCV],X[TestSetCV,],f(X[TestSetCV,]),mtry=round(PercentOfVariable[i]*length(X[1,])))$test$predicted)
+    fold_RMSE[j] <- sqrt(mean((f(X[TestSetCV,])-mean.y.hat)^2))
+    
+  }
+  # Store the average RMSE from cross-validation
+  results_matrixRF[i, 1] <- mean(fold_RMSE)
+  results_matrixRF[i,2] <- PercentOfVariable[i]
+}
+ordered_indices <- order(results_matrixRF[, 1])
+ordered_results <- results_matrixRF[ordered_indices, ]
+PercentOfVariable<-ordered_results[1,2]
+
+
+for (l in 67:num_of_datasets){
+  
+  X<-BenchmarkX[[l]]
+  Y<-BenchmarkY[[l]]
+  
+  Y<-as.numeric(as.matrix(Y))
+  
+  n=length(Y)
+  TrainSet<-matrix(nrow=trunc(n/6),ncol = NumOfRep)
+  TestSet<-matrix(nrow=n-trunc(n/6),ncol = NumOfRep)
+  
+  for (h in 1:NumOfRep){
+    TrainSet[,h]=sort(sample.int(n,n/6));
+    TestSetInit<-1:n
+    TestSet[,h]=TestSetInit[! TestSetInit %in% TrainSet[,h]];
+    
+  } 
+  
+  
+  Default.AddiVortes.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
+    library('invgamma')
+    library('FNN')
+    
+    AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),best_hyperparametersAddiVortes[1],1200,200,best_hyperparametersAddiVortes[2],best_hyperparametersAddiVortes[3],best_hyperparametersAddiVortes[4],best_hyperparametersAddiVortes[5],best_hyperparametersAddiVortes[6],best_hyperparametersAddiVortes[7],f(X[TestSet[,k],]),as.matrix(X[TestSet[,k],]))$Out_of_sample_RMSE
   }
   
+  BART.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
+    library('BayesTree')
+    library('expint')
+    
+    #bartMAchine
+    modelBART<-bart(as.matrix(X[TrainSet[,k],]),as.numeric(as.matrix(Y[TrainSet[,k]])),as.matrix(X[TestSet[,k],]),nskip = 1000,ndpost = 3000, ntree = best_hyperparametersBART[1], sigdf = best_hyperparametersBART[2],sigquant = best_hyperparametersBART[3],k = best_hyperparametersBART[4])
+    BART.RMSE<-(mean((f(X[TestSet[,k],])-modelBART$yhat.test.mean)**2))**0.5  
+  }
   
-  boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,],horizontal = TRUE, names = unique(c("AV-DF","BART","Random Forests", "Boosting")))
+  RForest.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
+    library('randomForest')
+    #randomForests
+    
+    RandomF<-randomForest(X[TrainSet[,k],],Y[TrainSet[,k]],X[TestSet[,k],],f(X[TestSet[,k],]),mtry = round(PercentOfVariable*length(X[1,])))
+    RForest.RMSE<-(mean((f(X[TestSet[,k],])-RandomF$test$predicted)**2))**0.5
+  }
+  
+  # Perform cross-validation with the bart function
+  Boost.RMSE<-vector(length=NumOfRep)
+  Boost.RMSE<-foreach(k = 1:NumOfRep,.combine = cbind) %dopar% {
+    library('gbm')
+    #Gradient Boosting
+    
+    data_frame_Train<-as.data.frame(cbind(Y[TrainSet],X[TrainSet,]))
+    data_frame_Test<-as.data.frame(cbind(f(X[TestSet,]),X[TestSet,]))
+    
+    gradientBoost<-gbm(V1~.,data=data_frame_Train,distribution="gaussian",interaction.depth = best_hyperparametersBoost[1],n.trees = best_hyperparametersBoost[2],shrinkage = best_hyperparametersBoost[3])
+    Boost.RMSE[k]<-(mean((f(X[TestSet,])-predict(gradientBoost,newdata=data_frame_Test))**2))**0.5
+  }
+  
+  SoftBART.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
+    library(SoftBart)
+    
+    df <- data.frame(X = X[TrainSet[,k],], Y = Y[TrainSet[,k]])
+    df_test <- data.frame(X = X[TestSet[,k],], Y=f(X[TestSet[,k],]))
+    
+    # Train the bart model
+    modelSoftBART<-softbart_regression(Y ~ ., df, df_test, num_tree = best_hyperparametersSoftBART[1],k =best_hyperparametersSoftBART[2])
+    
+    # Make predictions on the test 
+    SoftBART.RMSE<-sqrt(mean((modelSoftBART$mu_test_mean-f(X[TestSet[,k],]))^2))
+  }
+  
+  RMSE<-rbind(Default.AddiVortes.RMSE,BART.RMSE,RForest.RMSE,Boost.RMSE,SoftBART.RMSE)
+  
+  
+  print('Finished')
+  print(l)
+  
+  boxplot(RMSE[1,],RMSE[2,],RMSE[3,],RMSE[4,],RMSE[5,],horizontal = TRUE, names = unique(c("AddiVortes Default", "BART", "Random Forests","Gradient Boosting","SoftBART")))
+  
+  if (l==1){
+    All.RMSE<-matrix(nrow=4,ncol=NumOfRep)
+    All.RMSE<-RMSE
+  }
+  else{
+    All.RMSE<-cbind(All.RMSE,RMSE)
+  }
+  
+}
+
+stopCluster(cl3)
+
+for(i in 1:5){
+  All.RMSE[i,]<-as.vector(All.RMSE[i,])
+}
+
+mean(All.RMSE[2,])
+
+boxplot(All.RMSE[1,],All.RMSE[2,],All.RMSE[3,], All.RMSE[4,], All.RMSE[5,],horizontal = TRUE, names = unique(c("AddiVortes","BART","RF", "Boosting","SoftBART")))
+
 
   return(All.RMSE)
   
