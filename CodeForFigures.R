@@ -2454,7 +2454,7 @@ n = 1000      #number of observations
 BenchmarkX<-list()
 BenchmarkY<-list()
 for (i in 1:num_of_datasets){
-  BenchmarkX[[i]]=matrix(runif(n*100),n,100) #10 variables, only first 5 matter
+  BenchmarkX[[i]]=matrix(runif(n*10),n,10) #10 variables, only first 5 matter
   Ey = f(BenchmarkX[[i]])
   BenchmarkY[[i]]=Ey+sigma*rnorm(n)
 }
