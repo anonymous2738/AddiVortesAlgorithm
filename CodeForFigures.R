@@ -2089,13 +2089,12 @@ figure8<-function(){
              x1 = (burn_in+1):max_iter, y1 = plotForSigmaSquared[(burn_in):max_iter], col = "black", lwd = 2)
     abline(1,0)
     
-    return(
-      data.frame(
-        invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
-        invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
-        RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
-      )
-    )
+    print( data.frame(
+      invertal_Train = sum(in_interval_Train)/length(in_interval_Train),
+      invertal_Test = sum(in_interval_TEST)/length(in_interval_TEST),
+      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
+    ))
+    
   }
 
   
