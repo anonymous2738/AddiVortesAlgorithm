@@ -54,7 +54,7 @@ figure2<-function(list_of_datasets){
   NumOfRep <- 20
   num_folds <- 5
 
-  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
+  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,sd = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -78,7 +78,7 @@ figure2<-function(list_of_datasets){
   Tess=vector(length = m)
   for (i in 1:m){
     Dim[i]<-list(sample(1:length(x[1,]), 1))
-    Tess[i]<-(list(matrix(rnorm(1,0,var))))
+    Tess[i]<-(list(matrix(rnorm(1,0,sd))))
   }
   
   #Prepare some variables used in the backfitting algorithm
@@ -114,7 +114,7 @@ figure2<-function(list_of_datasets){
     SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
     
     for (j in 1:m){
-      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
       TessStar<-NewTessOutput[[1]]  
       DimStar<-NewTessOutput[[2]]
       Modification<-NewTessOutput[[3]]
@@ -178,7 +178,7 @@ figure2<-function(list_of_datasets){
     return(SigmaSquared)
   }
   
-  NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
+  NewTess<-function(x,j,Tess,Dim,sd){ #Propose a new tessellation
     
     p=runif(1,0,1) #Randomly sample p to decide the proposed modification to tessellation.
     
@@ -189,7 +189,7 @@ figure2<-function(list_of_datasets){
       NumberOfCovariates=1:length(x[1,]) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]] #Remove all values that for the covariates that are already in the tessellation.
       DimStar[[j]]<-c(Dim[[j]],sample(NumberOfCovariates,1)) # Uniformly sample a new covariate and add it to the dimension matrix.
-      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,var)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
+      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,sd)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
       Modification="AD"}
     else if (p<0.4){ #Remove a dimension if p is less then 0.4.
       RemovedDim=sample(1:length(Dim[[j]]),1) #Uniformly sample the dimension to be removed.
@@ -197,21 +197,21 @@ figure2<-function(list_of_datasets){
       TessStar[[j]]=matrix(TessStar[[j]][,-RemovedDim],ncol=length(DimStar[[j]])) #Remove the coordinates in the Tessellation matrix corresponding to the dimension removed.
       Modification="RD"}
     else if (p<0.6 || p<0.8 & length(Tess[[j]][,1])==1){ #Add a centre if p is less then 0.6 or if p is less then 0.4 when there is only one center in the Tessellation due to adjustments (Supplementary Material).
-      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,var)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
+      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,sd)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
       Modification="AC"}
     else if (p<0.8){ #Add a centre if p is less then 0.8. 
       CenterRemoved=sample(1:length(TessStar[[j]][,1]),1) #Sample a row.
       TessStar[[j]]=matrix(TessStar[[j]][-CenterRemoved,],ncol=length(Dim[[j]])) #Remove row sampled.
       Modification="RC"}
     else if (p<0.9 || length(Dim[[j]])==length(x[1,])){ #Change a center if p is less then 0.9 or if the all the covariates are in the tessellation.
-      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
+      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,sd) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
       Modification="Change"}
     else{ #Swop a dimension.
       NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
       DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
       DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
-      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,var) #Add new normally sampled coordinates new dimension added.
+      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,sd) #Add new normally sampled coordinates new dimension added.
       Modification="Swop"}
     
     TessStar[[j]]<-matrix(TessStar[[j]],ncol=length(DimStar[[j]])) #Ensure the the Tessellation matrix is a "matrix" type.
@@ -686,7 +686,7 @@ figure3<-function(){
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+      Tess[i]<-(list(matrix(rnorm(1,0,sd))))
     }
     
     #Prepare some variables used in the backfitting algorithm
@@ -727,7 +727,7 @@ figure3<-function(){
       plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
       for (j in 1:m){
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
         TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
@@ -885,7 +885,7 @@ figure4<-function(){
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+      Tess[i]<-(list(matrix(rnorm(1,0,sd))))
     }
     
     #Prepare some variables used in the backfitting algorithm
@@ -924,7 +924,7 @@ figure4<-function(){
       for (j in 1:m){
         
         
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
         TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
@@ -991,7 +991,7 @@ figure5<- function(max_iter = 6000 , burn_in = 1000){
   return(SigmaSquared)
 }
 
-NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
+NewTess<-function(x,j,Tess,Dim,sd){ #Propose a new tessellation
   
   p=runif(1,0,1) #Randomly sample p to decide the proposed modification to tessellation.
   
@@ -1002,7 +1002,7 @@ NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
     NumberOfCovariates=1:length(x[1,]) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
     NumberOfCovariates=NumberOfCovariates[-Dim[[j]]] #Remove all values that for the covariates that are already in the tessellation.
     DimStar[[j]]<-c(Dim[[j]],sample(NumberOfCovariates,1)) # Uniformly sample a new covariate and add it to the dimension matrix.
-    TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,var)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
+    TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,sd)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
     Modification="AD"}
   else if (p<0.4){ #Remove a dimension if p is less then 0.4.
     RemovedDim=sample(1:length(Dim[[j]]),1) #Uniformly sample the dimension to be removed.
@@ -1010,21 +1010,21 @@ NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
     TessStar[[j]]=matrix(TessStar[[j]][,-RemovedDim],ncol=length(DimStar[[j]])) #Remove the coordinates in the Tessellation matrix corresponding to the dimension removed.
     Modification="RD"}
   else if (p<0.6 || p<0.8 & length(Tess[[j]][,1])==1){ #Add a centre if p is less then 0.6 or if p is less then 0.4 when there is only one center in the Tessellation due to adjustments (Supplementary Material).
-    TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,var)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
+    TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,sd)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
     Modification="AC"}
   else if (p<0.8){ #Add a centre if p is less then 0.8. 
     CenterRemoved=sample(1:length(TessStar[[j]][,1]),1) #Sample a row.
     TessStar[[j]]=matrix(TessStar[[j]][-CenterRemoved,],ncol=length(Dim[[j]])) #Remove row sampled.
     Modification="RC"}
   else if (p<0.9 || length(Dim[[j]])==length(x[1,])){ #Change a center if p is less then 0.9 or if the all the covariates are in the tessellation.
-    TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
+    TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,sd) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
     Modification="Change"}
   else{ #Swop a dimension.
     NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
     NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
     DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
     DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
-    TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,var) #Add new normally sampled coordinates new dimension added.
+    TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,sd) #Add new normally sampled coordinates new dimension added.
     Modification="Swop"}
   
   TessStar[[j]]<-matrix(TessStar[[j]],ncol=length(DimStar[[j]])) #Ensure the the Tessellation matrix is a "matrix" type.
@@ -1189,7 +1189,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+      Tess[i]<-(list(matrix(rnorm(1,0,sd))))
     }
     
     #Prepare some variables used in the backfitting algorithm
@@ -1225,7 +1225,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
       SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
       for (j in 1:m){
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
         TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
@@ -1367,7 +1367,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
   Tess=vector(length = m)
   for (i in 1:m){
     Dim[i]<-list(sample(1:length(x[1,]), 1))
-    Tess[i]<-(list(matrix(rnorm(1,0,var))))}
+    Tess[i]<-(list(matrix(rnorm(1,0,sd))))}
   
   SumOfAllTess=rep(mean(yScaled),length(yScaled));
   SigmaSquaredMu=(0.5/(k*sqrt(m)))^2;
@@ -1407,7 +1407,7 @@ AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Om
     plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
     
     for (j in 1:m){
-      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var)
+      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd)
       TessStar<-NewTessOutput[[1]]
       DimStar<-NewTessOutput[[2]]
       Modification<-NewTessOutput[[3]]
@@ -1528,7 +1528,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
     return(SigmaSquared)
   }
   
-  NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
+  NewTess<-function(x,j,Tess,Dim,sd){ #Propose a new tessellation
     
     p=runif(1,0,1) #Randomly sample p to decide the proposed modification to tessellation.
     
@@ -1539,7 +1539,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
       NumberOfCovariates=1:length(x[1,]) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]] #Remove all values that for the covariates that are already in the tessellation.
       DimStar[[j]]<-c(Dim[[j]],sample(NumberOfCovariates,1)) # Uniformly sample a new covariate and add it to the dimension matrix.
-      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,var)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
+      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,sd)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
       Modification="AD"}
     else if (p<0.4){ #Remove a dimension if p is less then 0.4.
       RemovedDim=sample(1:length(Dim[[j]]),1) #Uniformly sample the dimension to be removed.
@@ -1547,21 +1547,21 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
       TessStar[[j]]=matrix(TessStar[[j]][,-RemovedDim],ncol=length(DimStar[[j]])) #Remove the coordinates in the Tessellation matrix corresponding to the dimension removed.
       Modification="RD"}
     else if (p<0.6 || p<0.8 & length(Tess[[j]][,1])==1){ #Add a centre if p is less then 0.6 or if p is less then 0.4 when there is only one center in the Tessellation due to adjustments (Supplementary Material).
-      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,var)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
+      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,sd)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
       Modification="AC"}
     else if (p<0.8){ #Add a centre if p is less then 0.8. 
       CenterRemoved=sample(1:length(TessStar[[j]][,1]),1) #Sample a row.
       TessStar[[j]]=matrix(TessStar[[j]][-CenterRemoved,],ncol=length(Dim[[j]])) #Remove row sampled.
       Modification="RC"}
     else if (p<0.9 || length(Dim[[j]])==length(x[1,])){ #Change a center if p is less then 0.9 or if the all the covariates are in the tessellation.
-      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
+      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,sd) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
       Modification="Change"}
     else{ #Swop a dimension.
       NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
       DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
       DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
-      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,var) #Add new normally sampled coordinates new dimension added.
+      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,sd) #Add new normally sampled coordinates new dimension added.
       Modification="Swop"}
     
     TessStar[[j]]<-matrix(TessStar[[j]],ncol=length(DimStar[[j]])) #Ensure the the Tessellation matrix is a "matrix" type.
@@ -1723,7 +1723,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
   Tess=vector(length = m)
   for (i in 1:m){
     Dim[i]<-list(sample(1:length(x[1,]), 1))
-    Tess[i]<-(list(matrix(rnorm(1,0,var))))
+    Tess[i]<-(list(matrix(rnorm(1,0,sd))))
   }
   
   #Prepare some variables used in the backfitting algorithm
@@ -1760,7 +1760,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
     
     
     for (j in 1:m){
-      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
       TessStar<-NewTessOutput[[1]]  
       DimStar<-NewTessOutput[[2]]
       Modification<-NewTessOutput[[3]]
@@ -1943,7 +1943,7 @@ figure8<-function(){
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+      Tess[i]<-(list(matrix(rnorm(1,0,sd))))
     }
     
     #Prepare some variables used in the backfitting algorithm
@@ -1984,7 +1984,7 @@ figure8<-function(){
       plotForRMSE[i]=(mean((yScaled-SumOfAllTess)^2))^0.5
       
       for (j in 1:m){
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
         TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
@@ -2143,7 +2143,7 @@ figure8<-function(){
 
 figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
 
-  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
+  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,sd = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -2167,7 +2167,7 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
     Tess=vector(length = m)
     for (i in 1:m){
       Dim[i]<-list(sample(1:length(x[1,]), 1))
-      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+      Tess[i]<-(list(matrix(rnorm(1,0,sd))))
     }
     
     #Prepare some variables used in the backfitting algorithm
@@ -2203,7 +2203,7 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
       SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
       for (j in 1:m){
-        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
         TessStar<-NewTessOutput[[1]]  
         DimStar<-NewTessOutput[[2]]
         Modification<-NewTessOutput[[3]]
@@ -2267,7 +2267,7 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
       return(SigmaSquared)
     }
     
-    NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
+    NewTess<-function(x,j,Tess,Dim,sd){ #Propose a new tessellation
       
       p=runif(1,0,1) #Randomly sample p to decide the proposed modification to tessellation.
       
@@ -2278,7 +2278,7 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
         NumberOfCovariates=1:length(x[1,]) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
         NumberOfCovariates=NumberOfCovariates[-Dim[[j]]] #Remove all values that for the covariates that are already in the tessellation.
         DimStar[[j]]<-c(Dim[[j]],sample(NumberOfCovariates,1)) # Uniformly sample a new covariate and add it to the dimension matrix.
-        TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,var)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
+        TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,sd)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
         Modification="AD"}
       else if (p<0.4){ #Remove a dimension if p is less then 0.4.
         RemovedDim=sample(1:length(Dim[[j]]),1) #Uniformly sample the dimension to be removed.
@@ -2286,21 +2286,21 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
         TessStar[[j]]=matrix(TessStar[[j]][,-RemovedDim],ncol=length(DimStar[[j]])) #Remove the coordinates in the Tessellation matrix corresponding to the dimension removed.
         Modification="RD"}
       else if (p<0.6 || p<0.8 & length(Tess[[j]][,1])==1){ #Add a centre if p is less then 0.6 or if p is less then 0.4 when there is only one center in the Tessellation due to adjustments (Supplementary Material).
-        TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,var)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
+        TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,sd)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
         Modification="AC"}
       else if (p<0.8){ #Add a centre if p is less then 0.8. 
         CenterRemoved=sample(1:length(TessStar[[j]][,1]),1) #Sample a row.
         TessStar[[j]]=matrix(TessStar[[j]][-CenterRemoved,],ncol=length(Dim[[j]])) #Remove row sampled.
         Modification="RC"}
       else if (p<0.9 || length(Dim[[j]])==length(x[1,])){ #Change a center if p is less then 0.9 or if the all the covariates are in the tessellation.
-        TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
+        TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,sd) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
         Modification="Change"}
       else{ #Swop a dimension.
         NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
         NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
         DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
         DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
-        TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,var) #Add new normally sampled coordinates new dimension added.
+        TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,sd) #Add new normally sampled coordinates new dimension added.
         Modification="Swop"}
       
       TessStar[[j]]<-matrix(TessStar[[j]],ncol=length(DimStar[[j]])) #Ensure the the Tessellation matrix is a "matrix" type.
