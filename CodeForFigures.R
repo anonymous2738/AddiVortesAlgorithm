@@ -2758,7 +2758,7 @@ ordered_results <- results_matrixRF[ordered_indices, ]
 PercentOfVariable<-ordered_results[1,2]
 
 
-for (l in 67:num_of_datasets){
+for (l in 1:num_of_datasets){
   
   X<-BenchmarkX[[l]]
   Y<-BenchmarkY[[l]]
