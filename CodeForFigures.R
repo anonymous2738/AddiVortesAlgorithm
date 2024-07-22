@@ -47,138 +47,139 @@ figure2<-function(list_of_datasets){
   library(doParallel) 
   library(foreach)
   library(randomForest)
-
+  
   par(mfrow =c(1,1))
   # Number of cross-validation folds
   # Number of cross-validation folds
   NumOfRep <- 20
   num_folds <- 5
-
-  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,sd = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
   
-  #Scaling x and y
-  yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
-  xScaled=x;
-  for (i in 1:length(x[1,])){
-    xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
-  }
-  
-  
-  for (i in 1:length(XTest[1,])){
-    XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
-  }
-  
-  #Initialize:
-  #Prediction Set (A list of vectors with the output values for each tessellation), 
-  #Dimension set (A list of vectors with the covariates included in the tessellaions);
-  #and Tessellation Set (A list of matrices that give the coordinates of the centers in the tessellations)
-  
-  Pred<-rep(list(matrix(mean(yScaled)/m)),m)
-  Dim=vector(length = m)
-  Tess=vector(length = m)
-  for (i in 1:m){
-    Dim[i]<-list(sample(1:length(x[1,]), 1))
-    Tess[i]<-(list(matrix(rnorm(1,0,sd))))
-  }
-  
-  #Prepare some variables used in the backfitting algorithm
-  SumOfAllTess=rep(mean(yScaled),length(yScaled))
-  SigmaSquaredMu=(0.5/(k*sqrt(m)))^2
-  LastTessPred=matrix
-  
-  #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
-  PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
-  TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
-  
-  #finding lambda
-  if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
-    SigmaSquaredHat=var(yScaled)
-  }
-  else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
-    MultiLinear<-lm(yScaled ~ xScaled)
-    SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
-  }
-  
-  #Find lambda
-  lambda=1;
-  lambda <- optim(par = 1,
-                  fitting_function,
-                  method = "Brent",
-                  lower = 0.001,
-                  upper = 100,
-                  q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
-  
-  for (i in 1:max_iter){
+  AddiVortes_Algorithm<-function(y,x,m = 200 ,max_iter = 1200,burn_in= 200,nu = 6,q =0.85,k = 3 ,var = 0.8 ,Omega = 3,lambda_rate = 25,YTest,XTest,IntialSigma = "Linear"){
     
-    #Sample Sigma squared using all tessellations to predict the outcome variables
-    SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
+    #Scaling x and y
+    yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
+    xScaled=x;
+    for (i in 1:length(x[1,])){
+      xScaled[,i]=(x[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
+    }
     
-    for (j in 1:m){
-      NewTessOutput<-NewTess(xScaled,j,Tess,Dim,sd) #Propose new Tessellation 
-      TessStar<-NewTessOutput[[1]]  
-      DimStar<-NewTessOutput[[2]]
-      Modification<-NewTessOutput[[3]]
+    
+    for (i in 1:length(XTest[1,])){
+      XTest[,i]=(XTest[,i]-(max(x[,i])+min(x[,i]))/2)/(max(x[,i])-min(x[,i]));
+    }
+    
+    #Initialize:
+    #Prediction Set (A list of vectors with the output values for each tessellation), 
+    #Dimension set (A list of vectors with the covariates included in the tessellaions);
+    #and Tessellation Set (A list of matrices that give the coordinates of the centers in the tessellations)
+    
+    Pred<-rep(list(matrix(mean(yScaled)/m)),m)
+    Dim=vector(length = m)
+    Tess=vector(length = m)
+    for (i in 1:m){
+      Dim[i]<-list(sample(1:length(x[1,]), 1))
+      Tess[i]<-(list(matrix(rnorm(1,0,var))))
+    }
+    
+    #Prepare some variables used in the backfitting algorithm
+    SumOfAllTess=rep(mean(yScaled),length(yScaled))
+    SigmaSquaredMu=(0.5/(k*sqrt(m)))^2
+    LastTessPred=matrix
+    
+    #Matrices that will hold the samples from the poseterior distribution for the training samples and test samples.
+    PredictionMatrix<-array(dim=c(length(y),(max_iter-burn_in)))
+    TestMatrix<-array(dim=c(length(YTest),(max_iter-burn_in)))
+    
+    #finding lambda
+    if (IntialSigma=="Naive"){ # Usually used if p is greater then n. Uses Standard deviation of y to predict sigma.
+      SigmaSquaredHat=var(yScaled)
+    }
+    else{  # Default method using residual standard deviation from a least-squared linear regression of y, to predict sigma.
+      MultiLinear<-lm(yScaled ~ xScaled)
+      SigmaSquaredHat=sum(MultiLinear$residuals^2)/(length(yScaled)-length(xScaled[1,])-1)
+    }
+    
+    #Find lambda
+    lambda=1;
+    lambda <- optim(par = 1,
+                    fitting_function,
+                    method = "Brent",
+                    lower = 0.001,
+                    upper = 100,
+                    q=q , nu=nu, sigmaSquared_hat=SigmaSquaredHat)$par
+    
+    for (i in 1:max_iter){
       
-      ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred) #Calculate the n-vector of partial residuals derived from a fitting process that excludes the jth tessellation and the number of observations in each cell.
-      R_ijOld<-ResidualsOutput[[1]]   #Old and New refer to the original and proposed tessellations
-      n_ijOld<-ResidualsOutput[[2]]
-      R_ijNew<-ResidualsOutput[[3]]
-      n_ijNew<-ResidualsOutput[[4]]
-      SumOfAllTess<-ResidualsOutput[[5]] #Keeps track of the prediction for all tessellations to help sample sigma squared.
-      IndexesStar<-ResidualsOutput[[6]] #Gives the row of each observation for the cell it falls in for the proposed tessellation.
-      Indexes<-ResidualsOutput[[7]]  #Gives the row of each observation for the cell it falls in for the original tessellation.
+      #Sample Sigma squared using all tessellations to predict the outcome variables
+      SigmaSquared=SigmaSquaredCalculation(yScaled,nu,lambda,SumOfAllTess)
       
-      if (!any(n_ijNew==0)){ #automatically rejects proposed tessellation if there exists a cell with no observations in.
+      for (j in 1:m){
+        NewTessOutput<-NewTess(xScaled,j,Tess,Dim,var) #Propose new Tessellation 
+        TessStar<-NewTessOutput[[1]]  
+        DimStar<-NewTessOutput[[2]]
+        Modification<-NewTessOutput[[3]]
         
-        LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate) #Gives the log of the acceptence probability.
+        ResidualsOutput<-CalculateResiduals(yScaled,xScaled,j,SumOfAllTess,Tess,Dim,Pred,TessStar,DimStar,LastTessPred) #Calculate the n-vector of partial residuals derived from a fitting process that excludes the jth tessellation and the number of observations in each cell.
+        R_ijOld<-ResidualsOutput[[1]]   #Old and New refer to the original and proposed tessellations
+        n_ijOld<-ResidualsOutput[[2]]
+        R_ijNew<-ResidualsOutput[[3]]
+        n_ijNew<-ResidualsOutput[[4]]
+        SumOfAllTess<-ResidualsOutput[[5]] #Keeps track of the prediction for all tessellations to help sample sigma squared.
+        IndexesStar<-ResidualsOutput[[6]] #Gives the row of each observation for the cell it falls in for the proposed tessellation.
+        Indexes<-ResidualsOutput[[7]]  #Gives the row of each observation for the cell it falls in for the original tessellation.
         
-        if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){ #Accepts the proposed tessellation is accepted then calculates the new output values for the new tessellation. 
-          Tess=TessStar
-          Dim=DimStar
-          Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
-          LastTessPred=Pred[[j]][IndexesStar]
+        if (!any(n_ijNew==0)){ #automatically rejects proposed tessellation if there exists a cell with no observations in.
+          
+          LOGAcceptenceProb=AlphaCalculation(xScaled,TessStar,DimStar,j,R_ijOld,n_ijOld,R_ijNew,n_ijNew,SigmaSquared,Modification,SigmaSquaredMu,Omega,lambda_rate) #Gives the log of the acceptence probability.
+          
+          if (log(runif(n=1, min=0, max=1))<LOGAcceptenceProb){ #Accepts the proposed tessellation is accepted then calculates the new output values for the new tessellation. 
+            Tess=TessStar
+            Dim=DimStar
+            Pred[[j]]=NewPredSet(j,TessStar,R_ijNew,n_ijNew,SigmaSquaredMu,SigmaSquared)
+            LastTessPred=Pred[[j]][IndexesStar]
+          }
+          else { #Rejects the proposed tesellation then calculates new output values for the original tessellation.
+            Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
+            LastTessPred=Pred[[j]][Indexes];
+          }
         }
-        else { #Rejects the proposed tesellation then calculates new output values for the original tessellation.
+        else{ #Rejects the proposed tesellation then calculates new output values for the original tessellation.
           Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
           LastTessPred=Pred[[j]][Indexes];
         }
+        if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
+          SumOfAllTess=SumOfAllTess+LastTessPred;
+        }
       }
-      else{ #Rejects the proposed tesellation then calculates new output values for the original tessellation.
-        Pred[[j]]=NewPredSet(j,Tess,R_ijOld,n_ijOld,SigmaSquaredMu,SigmaSquared);
-        LastTessPred=Pred[[j]][Indexes];
-      }
-      if (j==m){ #If j equals m then adds the last tessellation output values to give a prediction.
-        SumOfAllTess=SumOfAllTess+LastTessPred;
+      
+      if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
+        PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
+        TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
       }
     }
     
-    if (i>burn_in){ #vectors that hold the predictions for each iteration after burn in.
-      PredictionMatrix[,(i-burn_in)]=SumOfAllTess;
-      TestMatrix[,(i-burn_in)]=TestPrediction(XTest,m,Tess,Dim,Pred);
-    }
+    #finding the mean of the predition over the iterations and then unscaling the predictions.
+    mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+    mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
+    
+    return( #Returns the RMSE value for the test samples.
+      data.frame(
+        In_sample_RMSE = sqrt(mean((y-mean_yhat)^2)),
+        Out_of_sample_RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))     
+      )
+    )
   }
   
-  #finding the mean of the predition over the iterations and then unscaling the predictions.
-  mean_yhat=(rowSums(PredictionMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
-  mean_yhat_Test=(rowSums(TestMatrix)/(max_iter-burn_in))*(max(y)-min(y))+((max(y)+min(y))/2)
   
-  return( #Returns the RMSE value for the test samples.
-    data.frame(
-      RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
-    )
-  )
-}
-
-
   SigmaSquaredCalculation<-function(yScaled,nu,lambda,SumOfAllTess){ #Sample sigma squared from inverse gamma distribution
-  
+    
     n=length(yScaled)
     SigmaSquared<-rinvgamma(1,shape=(nu+n)/2,rate=(nu*lambda+sum((yScaled-SumOfAllTess)^2))/2)
     
     return(SigmaSquared)
   }
   
-  NewTess<-function(x,j,Tess,Dim,sd){ #Propose a new tessellation
+  NewTess<-function(x,j,Tess,Dim,var){ #Propose a new tessellation
     
     p=runif(1,0,1) #Randomly sample p to decide the proposed modification to tessellation.
     
@@ -189,7 +190,7 @@ figure2<-function(list_of_datasets){
       NumberOfCovariates=1:length(x[1,]) #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]] #Remove all values that for the covariates that are already in the tessellation.
       DimStar[[j]]<-c(Dim[[j]],sample(NumberOfCovariates,1)) # Uniformly sample a new covariate and add it to the dimension matrix.
-      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,sd)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
+      TessStar[[j]]=cbind(Tess[[j]],rnorm(length(Tess[[j]][,1]),0,var)) # Sample new coordinates from Normal distribution for the new dimension and add it to the Tessellation matrix.
       Modification="AD"}
     else if (p<0.4){ #Remove a dimension if p is less then 0.4.
       RemovedDim=sample(1:length(Dim[[j]]),1) #Uniformly sample the dimension to be removed.
@@ -197,21 +198,21 @@ figure2<-function(list_of_datasets){
       TessStar[[j]]=matrix(TessStar[[j]][,-RemovedDim],ncol=length(DimStar[[j]])) #Remove the coordinates in the Tessellation matrix corresponding to the dimension removed.
       Modification="RD"}
     else if (p<0.6 || p<0.8 & length(Tess[[j]][,1])==1){ #Add a centre if p is less then 0.6 or if p is less then 0.4 when there is only one center in the Tessellation due to adjustments (Supplementary Material).
-      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,sd)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
+      TessStar[[j]]=rbind(Tess[[j]],rnorm(length(Dim[[j]]),0,var)) #Add a new row of coordinates, sampled from a normal distribution, to the Tessellation matrix to add a center.
       Modification="AC"}
     else if (p<0.8){ #Add a centre if p is less then 0.8. 
       CenterRemoved=sample(1:length(TessStar[[j]][,1]),1) #Sample a row.
       TessStar[[j]]=matrix(TessStar[[j]][-CenterRemoved,],ncol=length(Dim[[j]])) #Remove row sampled.
       Modification="RC"}
     else if (p<0.9 || length(Dim[[j]])==length(x[1,])){ #Change a center if p is less then 0.9 or if the all the covariates are in the tessellation.
-      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,sd) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
+      TessStar[[j]][sample(1:length(TessStar[[j]][,1]),1),]=rnorm(length(Dim[[j]]),0,var) # Sample a row in the tessellaion matrix and change the coordinates of the centre by sampling from a normal distribution.
       Modification="Change"}
     else{ #Swop a dimension.
       NumberOfCovariates=1:length(x[1,])  #Let NumberOfCovariates be a vector from 1 to the number of covariates considered.
       NumberOfCovariates=NumberOfCovariates[-Dim[[j]]]  #Remove all values that for the covariates that are already in the tessellation.
       DimToChange=sample(1:length(Dim[[j]]),1) #Uniformly sample a dimension to change.
       DimStar[[j]][DimToChange]=sample(NumberOfCovariates,1) #Replace the Dimension to a new uniforly sampled covariate that is not already in the tessellaion.
-      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,sd) #Add new normally sampled coordinates new dimension added.
+      TessStar[[j]][,DimToChange]=rnorm(length(Tess[[j]][,1]),0,var) #Add new normally sampled coordinates new dimension added.
       Modification="Swop"}
     
     TessStar[[j]]<-matrix(TessStar[[j]],ncol=length(DimStar[[j]])) #Ensure the the Tessellation matrix is a "matrix" type.
@@ -238,10 +239,10 @@ figure2<-function(list_of_datasets){
     d=length(Dim[[j]]);
     NumCovariates=length(x[1,]);
     cStar=length(Tess[[j]][,1]);
-  
+    
     #The Log Likelihood Ratio in the acceptence ratio
     LOGlikelihoodRatio=0.5*(log(prod(n_ijOld*SigmaSquaredMu+SigmaSquared))-log(prod(n_ijNew*SigmaSquaredMu+SigmaSquared)))+((SigmaSquaredMu/(2*SigmaSquared))*(-sum((R_ijOld^2)/(n_ijOld*SigmaSquaredMu+SigmaSquared))+sum((R_ijNew^2)/(n_ijNew*SigmaSquaredMu+SigmaSquared))))
-  
+    
     #Calculating the acceptence probablity for "AD"=Adding a dimension, "RD"=Removing a dimension, "AC"=Adding a center, "RC"=Removing a center, "Change"=Changing the coordinates of a center and Swopping a dimension.
     if (Modification == "AD"){ 
       TessStructure=(dbinom(d-1,NumCovariates-1,Omega/NumCovariates))/(dbinom(d-2,NumCovariates-1,Omega/NumCovariates)*(NumCovariates-d+1))
@@ -272,7 +273,7 @@ figure2<-function(list_of_datasets){
       TessStructure=dpois(cStar-1,lambda_rate)/dpois(cStar-2,lambda_rate)
       TransitionRatio=1/cStar;
       AcceptenceProb=LOGlikelihoodRatio+log(TessStructure)+log(TransitionRatio)+0.5*log(SigmaSquared)
-  
+      
       #Adjustments.
       if (cStar==1){
         AcceptenceProb=AcceptenceProb+log(1/2);
@@ -282,7 +283,7 @@ figure2<-function(list_of_datasets){
       TessStructure=dpois(cStar-1,lambda_rate)/dpois(cStar,lambda_rate);
       TransitionRatio=cStar+1;
       AcceptenceProb=LOGlikelihoodRatio+log(TessStructure)+log(TransitionRatio)-0.5*log(SigmaSquared)
-  
+      
       #Adjustments.
       if (cStar==2){
         AcceptenceProb=AcceptenceProb+log(2);
@@ -388,17 +389,17 @@ figure2<-function(list_of_datasets){
   )
   
   # Function to remove first and last columns
-remove_first_last_columns <- function(mat) {
-  mat[, -c(1, ncol(mat))]
-}
-
-extract_last_column <- function(mat) {
-  mat[, ncol(mat)]
-}
-
-# Apply the function to each matrix in the list
-BenchmarkX <- lapply(list_of_datasets, remove_first_last_columns)
-BenchmarkY<- lapply(list_of_datasets, extract_last_column)
+  remove_first_last_columns <- function(mat) {
+    mat[, -c(1, ncol(mat))]
+  }
+  
+  extract_last_column <- function(mat) {
+    mat[, ncol(mat)]
+  }
+  
+  # Apply the function to each matrix in the list
+  BenchmarkX <- lapply(list_of_datasets, remove_first_last_columns)
+  BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   
   num_cores <- 10 # Specify the number of cores you want to use
   cl <- makeCluster(num_cores)
@@ -421,11 +422,10 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
       TestSet[,h]=TestSetInit[! TestSetInit %in% TrainSet[,h]];
       
     }  
-
+    
     #Cross validation
     folds <- createFolds(X, k = num_folds)  # 5-fold cross-validation
     
-   
     # Initialize a matrix to store the results
     results_matrixAddiVortes <- matrix(ncol = 8, nrow = nrow(hyperparametersAddiVortes))
     rmse_values<-vector(length = num_folds)
@@ -453,7 +453,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
         k<- params$k
         
         # Make predictions on the test set
-        rmse_values[j] <- AddiVortes_Algorithm(Y[TrainSetCV],as.matrix(X[TrainSetCV,]),m,1200,200,nu,q,k,sd,omega,lambda,Y[TestSetCV],as.matrix(X[TestSetCV,]))$RMSE
+        rmse_values[j] <- AddiVortes_Algorithm(Y[TrainSetCV],as.matrix(X[TrainSetCV,]),m,1200,200,nu,q,k,sd,omega,lambda,Y[TestSetCV],as.matrix(X[TestSetCV,]))$Out_of_sample_RMSE
       }                   
       # Store the average RMSE from cross-validation
       return(c(m,nu,q,k,sd,omega,lambda,mean(rmse_values)))
@@ -495,7 +495,7 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
       
       # Store the average RMSE from cross-validation
       results_matrixBART[i,] <- cbind(params$m,params$nu_q[[1]][1],params$nu_q[[1]][2],params$k,mean(rmse_values))
-  
+      
     }
     
     print('Finished BART Tuning')
@@ -568,19 +568,64 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
     
     print('Finished RF tuning')
     
+    # Initialise results matrix
+    results_matrixGBM <- matrix(ncol = 4, nrow = nrow(hyperparametersBoost))
+    
+    # Iterate over hyperparameter combinations
+    results_matrixGBM <- foreach(i = 1:nrow(hyperparametersBoost), .combine = rbind) %dopar% {
+      params <- hyperparametersBoost[i, ]
+      rmse_values <- numeric(num_folds)
+      library(gbm)
+      
+      # Perform cross-validation
+      for (j in 1:num_folds) {
+        TrainSetCV <- unlist(folds[-j], use.names = FALSE)
+        TestSetCV <- folds[[j]]
+        
+        num_trees <- params$num_trees
+        depth <- params$depth
+        eta <- params$eta
+        
+        # Train the gbm model
+        gbm_model <- gbm(
+          formula = Y ~ .,
+          distribution = "gaussian",
+          data = data.frame(X = X[TrainSetCV, ], Y = Y[TrainSetCV]),
+          n.trees = num_trees,
+          interaction.depth = depth,
+          shrinkage = eta,
+          train.fraction = 1.0,
+          verbose = FALSE
+        )
+        
+        # Make predictions on the test set
+        yhat_test <- predict(gbm_model, newdata = data.frame(X = X[TestSetCV, ]), n.trees = num_trees)
+        rmse_values[j] <- sqrt(mean((Y[TestSetCV] - yhat_test) ^ 2))
+      }
+      
+      # Store the average RMSE from cross-validation
+      c(params$num_trees, params$depth, params$eta, mean(rmse_values))
+    }
+    
+    print('Finished GBM Tuning')
+    
+    # Find the best hyperparameters
+    best_hyperparametersBoost <- results_matrixGBM[which.min(results_matrixGBM[, 4]), 1:3]
+    
+    
     
     CV.AddiVortes.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
       library('invgamma')
       library('FNN')
-    
-      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),best_hyperparametersAddiVortes[1],1200,200,best_hyperparametersAddiVortes[2],best_hyperparametersAddiVortes[3],best_hyperparametersAddiVortes[4],best_hyperparametersAddiVortes[5],best_hyperparametersAddiVortes[6],best_hyperparametersAddiVortes[7],Y[TestSet[,k]],as.matrix(X[TestSet[,k],]))$RMSE
+      
+      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),best_hyperparametersAddiVortes[1],1200,200,best_hyperparametersAddiVortes[2],best_hyperparametersAddiVortes[3],best_hyperparametersAddiVortes[4],best_hyperparametersAddiVortes[5],best_hyperparametersAddiVortes[6],best_hyperparametersAddiVortes[7],Y[TestSet[,k]],as.matrix(X[TestSet[,k],]))$Out_of_sample_RMSE
     }
     
     Default.AddiVortes.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
       library('invgamma')
       library('FNN')
       
-      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),200,1200,200,6,0.85,3,0.8,3,25,Y[TestSet[,k]],as.matrix(X[TestSet[,k],]))$RMSE
+      AddiVortes.RMSE <- AddiVortes_Algorithm(Y[TrainSet[,k]],as.matrix(X[TrainSet[,k],]),200,1200,200,6,0.85,3,0.8,3,25,Y[TestSet[,k]],as.matrix(X[TestSet[,k],]))$Out_of_sample_RMSE
     }
     
     BART.RMSE<-foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
@@ -613,9 +658,29 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
       RandomF<-randomForest(X[TrainSet[,k],],Y[TrainSet[,k]],X[TestSet[,k],],Y[TestSet[,k]],mtry = round(PercentOfVariable*length(X[1,])))
       RForest.RMSE<-(mean((Y[TestSet[,k]]-RandomF$test$predicted)**2))**0.5
     }
+    
+    # Perform final evaluation with the best hyperparameters
+    gbm.RMSE <- foreach(k = 1:NumOfRep, .combine = cbind) %dopar% {
+      # Train the gbm model with best hyperparameters
+      library(gbm)
+      final_gbm_model <- gbm(
+        formula = Y ~ .,
+        distribution = "gaussian",
+        data = data.frame(X = X[TrainSet[, k], ], Y = Y[TrainSet[, k]]),
+        n.trees = best_hyperparametersBoost[1],
+        interaction.depth = best_hyperparametersBoost[2],
+        shrinkage = best_hyperparametersBoost[3],
+        train.fraction = 1.0,
+        verbose = FALSE
+      )
       
-      
-    RMSE<-rbind(CV.AddiVortes.RMSE,Default.AddiVortes.RMSE,BART.RMSE,RForest.RMSE,SoftBART.RMSE)
+      # Make predictions on the test set
+      final_yhat_test <- predict(final_gbm_model, newdata = data.frame(X = X[TestSet[, k], ]), n.trees = best_hyperparametersBoost[1])
+      sqrt(mean((Y[TestSet[, k]] - final_yhat_test) ^ 2))
+    }
+    
+    
+    RMSE<-rbind(CV.AddiVortes.RMSE,Default.AddiVortes.RMSE,BART.RMSE,RForest.RMSE,SoftBART.RMSE,gbm.RMSE)
     
     print(l)
     
@@ -633,17 +698,18 @@ BenchmarkY<- lapply(list_of_datasets, extract_last_column)
   }
   
   stopCluster(cl)
-    
+  
   Smaller.RRMSE.AddiVortesCV<-All.RRMSE[1,All.RRMSE[1,]<1.5]
   Smaller.RRMSE.AddiVortesDef<-All.RRMSE[2,All.RRMSE[2,]<1.5]
   Smaller.RRMSE.BART<-All.RRMSE[3,All.RRMSE[3,]<1.5]
   Smaller.RRMSE.RF<-All.RRMSE[4,All.RRMSE[4,]<1.5]
+  Smaller.RRMSE.SoftBART<-All.RRMSE[5,All.RRMSE[5,]<1.5]
   
-  boxplot(as.numeric(Smaller.RRMSE.AddiVortesCV),as.numeric(Smaller.RRMSE.AddiVortesDef),as.numeric(Smaller.RRMSE.BART), as.numeric(Smaller.RRMSE.RF),horizontal = TRUE, names = unique(c("AddiVortes-CV", "AddiVortes-default","BART","Random Forests")))
+  boxplot(as.numeric(Smaller.RRMSE.AddiVortesCV),as.numeric(Smaller.RRMSE.AddiVortesDef),as.numeric(Smaller.RRMSE.BART), as.numeric(Smaller.RRMSE.RF),horizontal = TRUE, names = unique(c("AddiVortes-CV", "AddiVortes-default","BART","Random Forests","SoftBART")))
   return(All.RRMSE)
-           
+  
 }
-
+                 
 figure3<-function(){
 
   f = function(x){
