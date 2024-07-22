@@ -132,7 +132,7 @@ For example, to get RRMSE values for the datasets: Rate, Edu, Enroll and Mpg, yo
 
 ```r
 
-RRMSE <- figure2(list(Rate,Edu,Enroll,Mpg))
+RRMSE <- figure2(list(Rate,Mpg,Fat))
 
 ```
 
