@@ -2319,7 +2319,7 @@ figure9<-function(max_iter = 1200, burn_in= 200, num_of_datasets= 100){
     
     return( #Returns the RMSE value for the test samples.
       data.frame(
-        RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
+        Out_of_sample_RMSE = sqrt(mean((YTest-mean_yhat_Test)^2))
       )
     )
   }
