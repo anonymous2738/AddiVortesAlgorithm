@@ -664,7 +664,7 @@ figure3<-function(){
   
   par(mfrow =c(1,3))
   
-  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,sd,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -866,7 +866,7 @@ figure4<-function(){
   
   par(mfrow =c(1,2))
   
-  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,nu,q,k,var,Omega,lambda_rate,IntialSigma = "Linear"){
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,nu,q,k,sd,Omega,lambda_rate,IntialSigma = "Linear"){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -1165,7 +1165,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
   return(Prediction)
 }
   
-  AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+  AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,sd,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
   
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -1344,7 +1344,7 @@ TestPrediction<-function(x,m,Tess,Dim,Pred){ #A function that derives a predicti
 
 figure6<-function(max_iter = 6000, burn_in = 1000){
 
-AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+AddiVortes_Algorithm_Plot_figure6<-function(y,x,m,max_iter,burn_in,nu,q,k,sd,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
 
   p=length(x[1,]) #p is the number of covariates used
   
@@ -1699,7 +1699,7 @@ figure7<-function(max_iter = 6000, burn_in = 1000, num_of_datasets = 100){
     return(Prediction)
   }
   
-  AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
+  AddiVortes_Algorithm<-function(y,x,m,max_iter,burn_in,nu,q,k,sd,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear"){
   
   #Scaling x and y
   yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
@@ -1921,7 +1921,7 @@ figure8<-function(){
   
   par(mfrow =c(3,3))
   
-  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,var,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear",p){
+  AddiVortes_Algorithm_Plot<-function(y,x,m,max_iter,burn_in,nu,q,k,sd,Omega,lambda_rate,YTest,XTest,IntialSigma = "Linear",p){
     
     #Scaling x and y
     yScaled=(y-(max(y)+min(y))/2)/(max(y)-min(y))
