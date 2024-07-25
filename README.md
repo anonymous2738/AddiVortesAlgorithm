@@ -27,9 +27,9 @@ source_url("https://raw.githubusercontent.com/anonymous2738/AddiVortesAlgorithm/
 The following function can then be used in Rstudio.
 
 ```r
- AddiVortes_Algorithm <- function(y, x, m = 200, max_iter = 1200, burn_in = 200,
-                                  nu = 6, q =0.85, k = 3, sd = 0.8, Omega = 3,
-                                  lambda_rate = 25, YTest, XTest, IntialSigma = "Linear", thinning = 1){}
+ AddiVortes_Algorithm(y, x, m = 200, max_iter = 1200, burn_in = 200,
+                       nu = 6, q =0.85, k = 3, sd = 0.8, Omega = 3,
+                       lambda_rate = 25, YTest, XTest, IntialSigma = "Linear", thinning = 1)
 ```
 ### Arguments
 
