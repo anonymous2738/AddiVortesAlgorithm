@@ -33,7 +33,7 @@ The following function can then be used in Rstudio.
 ```
 ### Arguments
 
-`y`- Dependent variable for training (in sample) data. A numerical vector with output value with the same index as the corresponding row of observation in x.
+`y`- Dependent variable for training (in sample) data. A numerical vector with index of output value corresponding to the row of observation in x.
 
 `x`- Explanatory variables for training (in sample) data. A matrix with (as usual) rows corresponding to observations and columns to variables.
 
